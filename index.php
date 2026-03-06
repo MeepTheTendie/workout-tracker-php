@@ -38,14 +38,35 @@ function localApi($endpoint, $id = null) {
             }
         }
         
+        $volumeByExercise = [];
+        $exerciseIds = array_unique(array_column($sets, 'exercise_id'));
+        foreach ($exerciseIds as $exId) {
+            $exSets = array_filter($sets, fn($s) => $s['exercise_id'] == $exId);
+            $exName = !empty($exSets) ? ($exSets[array_key_first($exSets)]['name'] ?? 'Unknown') : 'Unknown';
+            $volume = array_reduce($exSets, fn($sum, $s) => $sum + (($s['weight'] ?? 0) * ($s['reps'] ?? 0)), 0);
+            $volumeByExercise[] = [
+                'exercise_id' => $exId,
+                'exercise_name' => $exName,
+                'total_sets' => count($exSets),
+                'volume' => $volume
+            ];
+        }
+        usort($volumeByExercise, fn($a, $b) => $b['volume'] - $a['volume']);
+        
+        $thirtyDaysAgo = (time() - 30 * 86400) * 1000;
+        $recentWorkouts = array_filter($workouts, fn($w) => $w['started_at'] >= $thirtyDaysAgo);
+        $recentWorkoutIds = array_column($recentWorkouts, 'id');
+        $recentSets = array_filter($sets, fn($s) => in_array($s['workout_id'], $recentWorkoutIds));
+        $recentVolume = array_reduce($recentSets, fn($sum, $s) => $sum + (($s['weight'] ?? 0) * ($s['reps'] ?? 0)), 0);
+        
         return [
             'totalWorkouts' => $totalWorkouts,
             'totalVolume' => $totalVolume,
             'avgDuration' => round($avgDuration),
             'streak' => $streak,
-            'volumeByExercise' => [],
-            'recentVolume' => 0,
-            'recentWorkouts' => 0
+            'volumeByExercise' => $volumeByExercise,
+            'recentVolume' => $recentVolume,
+            'recentWorkouts' => count($recentWorkouts)
         ];
     }
     
@@ -91,6 +112,39 @@ function localApi($endpoint, $id = null) {
         
         return $workouts;
     }
+
+    if ($endpoint === 'prs') {
+        $sets = $db->query("SELECT ws.*, e.name as exercise_name FROM workout_sets ws JOIN exercises e ON ws.exercise_id = e.id")->fetchAll(PDO::FETCH_ASSOC);
+        
+        $prs = [];
+        foreach ($sets as $set) {
+            $exId = $set['exercise_id'];
+            if (!isset($prs[$exId])) {
+                $prs[$exId] = [
+                    'exercise_id' => $exId,
+                    'exercise_name' => $set['exercise_name'],
+                    'max_weight' => 0,
+                    'max_reps' => 0,
+                    'max_volume' => 0
+                ];
+            }
+            $volume = ($set['weight'] ?? 0) * ($set['reps'] ?? 0);
+            if (($set['weight'] ?? 0) > $prs[$exId]['max_weight']) {
+                $prs[$exId]['max_weight'] = $set['weight'];
+                $prs[$exId]['weight_at_max_reps'] = $set['reps'];
+            }
+            if (($set['reps'] ?? 0) > $prs[$exId]['max_reps']) {
+                $prs[$exId]['max_reps'] = $set['reps'];
+                $prs[$exId]['reps_at_max_weight'] = $set['weight'];
+            }
+            if ($volume > $prs[$exId]['max_volume']) {
+                $prs[$exId]['max_volume'] = $volume;
+            }
+        }
+        
+        usort($prs, fn($a, $b) => $b['max_volume'] - $a['max_volume']);
+        return array_values($prs);
+    }
     
     return null;
 }
@@ -101,7 +155,7 @@ function formatVolume($vol) {
     return $vol;
 }
 
-$validPages = ['index', 'workout', 'history', 'stats', 'goals', 'routines', 'workout_detail'];
+$validPages = ['index', 'workout', 'history', 'stats', 'goals', 'routines', 'workout_detail', 'prs'];
 if (!in_array($page, $validPages)) {
     $page = 'index';
 }
@@ -126,7 +180,7 @@ if (!in_array($page, $validPages)) {
             <a href="/?page=workout" class="nav-btn <?= $page === 'workout' ? 'active' : '' ?>">LOG</a>
             <a href="/?page=history" class="nav-btn <?= $page === 'history' ? 'active' : '' ?>">HISTORY</a>
             <a href="/?page=stats" class="nav-btn <?= $page === 'stats' ? 'active' : '' ?>">STATS</a>
-            <a href="/?page=goals" class="nav-btn <?= $page === 'goals' ? 'active' : '' ?>">PRS</a>
+            <a href="/?page=prs" class="nav-btn <?= $page === 'prs' ? 'active' : '' ?>">PRS</a>
         </nav>
     </div>
 </body>
