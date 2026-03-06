@@ -2,6 +2,7 @@
 $routines = localApi('routines');
 $exercises = localApi('exercises');
 $id = $_GET['id'] ?? null;
+$routine = null;
 
 if ($id) {
     $db = getDB();
@@ -53,6 +54,22 @@ if ($id) {
         
         <div class="section-header">
             <span class="section-title">Exercises</span>
+            <button class="section-action" onclick="document.getElementById('addExerciseForm').style.display='block'">+ Add</button>
+        </div>
+        
+        <div id="addExerciseForm" style="display:none; margin-bottom: 16px; padding: 12px; background: var(--bg); border: 2px solid var(--border);">
+            <select id="newExerciseId" class="form-input" style="margin-bottom: 8px;">
+                <option value="">Select exercise...</option>
+                <?php foreach ($exercises as $ex): ?>
+                    <option value="<?= $ex['id'] ?>"><?= $ex['name'] ?></option>
+                <?php endforeach; ?>
+            </select>
+            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <input type="number" id="targetSets" class="form-input" placeholder="Sets" value="3" style="flex:1">
+                <input type="number" id="targetReps" class="form-input" placeholder="Reps" value="8" style="flex:1">
+                <input type="number" id="targetWeight" class="form-input" placeholder="Lbs" style="flex:1">
+            </div>
+            <button class="btn" style="width: 100%;" onclick="addExerciseToRoutine(<?= $routine['id'] ?>)">ADD</button>
         </div>
         
         <?php if (empty($routine['exercises'])): ?>
@@ -132,5 +149,32 @@ async function startWorkout(routineId) {
     });
     const data = await res.json();
     location.href = '/?page=workout';
+}
+
+async function addExerciseToRoutine(routineId) {
+    const exerciseId = document.getElementById('newExerciseId').value;
+    const targetSets = document.getElementById('targetSets').value;
+    const targetReps = document.getElementById('targetReps').value;
+    const targetWeight = document.getElementById('targetWeight').value;
+    
+    if (!exerciseId) {
+        alert('Please select an exercise');
+        return;
+    }
+    
+    await fetch('/api/routines.php?action=routine-exercises', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            routine_id: routineId,
+            exercise_id: exerciseId,
+            order_index: 0,
+            target_sets: parseInt(targetSets) || 3,
+            target_reps: parseInt(targetReps) || 8,
+            target_weight: parseFloat(targetWeight) || null
+        })
+    });
+    
+    location.reload();
 }
 </script>
