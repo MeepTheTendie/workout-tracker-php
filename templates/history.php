@@ -84,7 +84,7 @@ $stats = [
                 <?php foreach ($monthWorkouts as $w): 
                     $relativeDate = getRelativeDate($w['started_at']);
                 ?>
-                    <a href="/?page=workout&id=<?= $w['id'] ?>" style="text-decoration: none; color: inherit; display: block;">
+                    <a href="/?page=workout_detail&id=<?= $w['id'] ?>" style="text-decoration: none; color: inherit; display: block;">
                         <div style="
                             padding: 16px 20px;
                             border-bottom: 1px solid var(--border);

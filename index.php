@@ -101,7 +101,7 @@ function formatVolume($vol) {
     return $vol;
 }
 
-$validPages = ['index', 'workout', 'history', 'stats', 'goals', 'routines'];
+$validPages = ['index', 'workout', 'history', 'stats', 'goals', 'routines', 'workout_detail'];
 if (!in_array($page, $validPages)) {
     $page = 'index';
 }
