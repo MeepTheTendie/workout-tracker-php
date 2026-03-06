@@ -8,7 +8,6 @@ function getDB() {
     if ($db === null) {
         $db = new PDO('sqlite:' . DB_PATH);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        seedExercisesIfNeeded($db);
     }
     return $db;
 }
