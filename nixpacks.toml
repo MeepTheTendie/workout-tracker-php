@@ -1,0 +1,9 @@
+[providers.railway]
+  [providers.railway.variables]
+    PHP_VERSION = '8.2'
+
+[phases.setup]
+  aptPackages = ['sqlite3', 'libsqlite3-dev']
+
+[nixpacks.version]
+  php = '8.2'
