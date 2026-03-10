@@ -42,7 +42,7 @@ function localApi($endpoint, $id = null) {
         $exerciseIds = array_unique(array_column($sets, 'exercise_id'));
         foreach ($exerciseIds as $exId) {
             $exSets = array_filter($sets, fn($s) => $s['exercise_id'] == $exId);
-            $exName = !empty($exSets) ? ($exSets[array_key_first($exSets)]['name'] ?? 'Unknown') : 'Unknown';
+            $exName = !empty($exSets) ? ($exSets[array_key_first($exSets)]['exercise_name'] ?? 'Unknown') : 'Unknown';
             $volume = array_reduce($exSets, fn($sum, $s) => $sum + (($s['weight'] ?? 0) * ($s['reps'] ?? 0)), 0);
             $volumeByExercise[] = [
                 'exercise_id' => $exId,
