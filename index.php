@@ -81,7 +81,7 @@ function localApi($endpoint, $id = null) {
             (SELECT COALESCE(MAX(ws.weight), 0) FROM workout_sets ws WHERE ws.exercise_id = g.exercise_id) as current_weight
             FROM goals g
             JOIN exercises e ON g.exercise_id = e.id
-            WHERE g.completed = 0
+            WHERE g.completed = FALSE
             ORDER BY g.created_at DESC
         ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

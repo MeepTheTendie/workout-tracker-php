@@ -3,7 +3,7 @@ $goals = localApi('goals');
 $exercises = localApi('exercises');
 
 $db = getDB();
-$stmt = $db->query("SELECT g.*, e.name as exercise_name FROM goals g JOIN exercises e ON g.exercise_id = e.id WHERE g.completed = 1 ORDER BY g.created_at DESC");
+$stmt = $db->query("SELECT g.*, e.name as exercise_name FROM goals g JOIN exercises e ON g.exercise_id = e.id WHERE g.completed = TRUE ORDER BY g.created_at DESC");
 $completedGoals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <div class="page-header">

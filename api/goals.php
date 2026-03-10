@@ -18,7 +18,7 @@ if ($method === 'GET' && $action === 'goals') {
     ";
     
     if ($activeOnly) {
-        $query .= " WHERE g.completed = 0";
+        $query .= " WHERE g.completed = FALSE";
     }
     
     $query .= " ORDER BY g.created_at DESC";
