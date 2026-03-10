@@ -13,7 +13,7 @@ function formatDuration($started, $ended) {
 
 function getRelativeDate($timestamp) {
     $now = time() * 1000;
-    $diff = floor(($now - $timestamp) / 86400000);
+    $diff = (int) floor(($now - $timestamp) / 86400000);
     
     if ($diff === 0) return 'Today';
     if ($diff === 1) return 'Yesterday';

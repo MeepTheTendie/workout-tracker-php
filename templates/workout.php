@@ -104,7 +104,7 @@ document.getElementById('startWorkoutBtn')?.addEventListener('click', async () =
         body: JSON.stringify({started_at: Date.now()})
     });
     const data = await res.json();
-    currentWorkoutId = data.id;
+    currentWorkoutId = parseInt(data.id);
     document.getElementById('startWorkoutBtn').style.display = 'none';
     document.getElementById('activeWorkout').style.display = 'block';
     renderSets();
