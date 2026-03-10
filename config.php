@@ -4,7 +4,13 @@ $dbType = getenv('DATABASE_URL') ? 'pgsql' : 'sqlite';
 
 if ($dbType === 'pgsql') {
     $dbUrl = getenv('DATABASE_URL');
-    $db = new PDO($dbUrl);
+    $parsed = parse_url($dbUrl);
+    $dsn = sprintf('pgsql:host=%s;port=%s;dbname=%s', 
+        $parsed['host'] ?? 'localhost', 
+        $parsed['port'] ?? 5432, 
+        ltrim($parsed['path'], '/')
+    );
+    $db = new PDO($dsn, $parsed['user'] ?? null, $parsed['pass'] ?? null);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
     $result = $db->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'exercises'");
@@ -26,7 +32,13 @@ function getDB() {
     if ($db === null) {
         $dbUrl = getenv('DATABASE_URL');
         if ($dbUrl) {
-            $db = new PDO($dbUrl);
+            $parsed = parse_url($dbUrl);
+            $dsn = sprintf('pgsql:host=%s;port=%s;dbname=%s', 
+                $parsed['host'] ?? 'localhost', 
+                $parsed['port'] ?? 5432, 
+                ltrim($parsed['path'], '/')
+            );
+            $db = new PDO($dsn, $parsed['user'] ?? null, $parsed['pass'] ?? null);
             $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } else {
             $db = new PDO('sqlite:' . DB_PATH);
