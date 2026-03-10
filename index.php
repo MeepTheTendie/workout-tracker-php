@@ -11,7 +11,7 @@ function localApi($endpoint, $id = null) {
     
     if ($endpoint === 'stats') {
         $workouts = $db->query("SELECT * FROM workouts")->fetchAll(PDO::FETCH_ASSOC);
-        $sets = $db->query("SELECT * FROM workout_sets")->fetchAll(PDO::FETCH_ASSOC);
+        $sets = $db->query("SELECT ws.*, e.name as exercise_name FROM workout_sets ws JOIN exercises e ON ws.exercise_id = e.id")->fetchAll(PDO::FETCH_ASSOC);
         
         $totalWorkouts = count($workouts);
         $totalVolume = array_reduce($sets, fn($sum, $s) => $sum + (($s['weight'] ?? 0) * ($s['reps'] ?? 0)), 0);
