@@ -6,6 +6,11 @@ require_once __DIR__ . '/../lib/Database.php';
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
+if (!isLoggedIn()) {
+    http_response_code(401);
+    jsonResponse(['error' => 'Unauthorized']);
+}
+
 if ($method === 'GET' && $action === 'goals') {
     $db = getDB();
     $activeOnly = $_GET['activeOnly'] ?? false;
@@ -38,12 +43,21 @@ if ($method === 'POST' && $action === 'goals') {
         jsonResponse(['error' => 'exercise_id and target_weight required']);
     }
     
+    $exerciseId = (int)$data['exercise_id'];
+    $targetWeight = (float)$data['target_weight'];
+    $targetReps = isset($data['target_reps']) ? max(1, (int)$data['target_reps']) : 1;
+    
+    if ($targetWeight <= 0 || $targetWeight > 10000) {
+        http_response_code(400);
+        jsonResponse(['error' => 'Invalid target_weight']);
+    }
+    
     $db = getDB();
     $stmt = $db->prepare("INSERT INTO goals (exercise_id, target_weight, target_reps, deadline, created_at) VALUES (?, ?, ?, ?, ?)");
     $stmt->execute([
-        $data['exercise_id'],
-        $data['target_weight'],
-        $data['target_reps'] ?? 1,
+        $exerciseId,
+        $targetWeight,
+        $targetReps,
         $data['deadline'] ?? null,
         time() * 1000
     ]);
@@ -55,7 +69,7 @@ if ($method === 'PATCH' && $action === 'goals') {
     requireMethod('PATCH');
     $data = json_decode(file_get_contents('php://input'), true);
     
-    if (empty($data['id'])) {
+    if (empty($data['id']) || !is_numeric($data['id'])) {
         http_response_code(400);
         jsonResponse(['error' => 'ID required']);
     }
@@ -84,14 +98,14 @@ if ($method === 'DELETE' && $action === 'goals') {
     requireMethod('DELETE');
     $id = $_GET['id'] ?? null;
     
-    if (!$id) {
+    if (!$id || !is_numeric($id)) {
         http_response_code(400);
         jsonResponse(['error' => 'ID required']);
     }
     
     $db = getDB();
     $stmt = $db->prepare("DELETE FROM goals WHERE id = ?");
-    $stmt->execute([$id]);
+    $stmt->execute([(int)$id]);
     
     jsonResponse(['success' => true]);
 }

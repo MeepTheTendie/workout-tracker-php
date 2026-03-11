@@ -24,7 +24,7 @@ if ($id) {
 }
 ?>
 <div class="page-header">
-    <div class="page-title"><?= $routine ? strtoupper($routine['name']) : 'ROUTINES' ?></div>
+    <div class="page-title"><?= $routine ? strtoupper(h($routine['name'])) : 'ROUTINES' ?></div>
     <?php if (!$routine): ?>
         <button class="btn" onclick="document.getElementById('addRoutineForm').style.display='block'">+ New</button>
     <?php endif; ?>
@@ -46,11 +46,11 @@ if ($id) {
     </div>
 <?php endif; ?>
 
-<?php if ($routine): ?>
-    <div class="section">
-        <?php if (!empty($routine['description'])): ?>
-            <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 16px;"><?= $routine['description'] ?></div>
-        <?php endif; ?>
+    <?php if ($routine): ?>
+        <div class="section">
+            <?php if (!empty($routine['description'])): ?>
+                <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 16px;"><?= h($routine['description']) ?></div>
+            <?php endif; ?>
         
         <div class="section-header">
             <span class="section-title">Exercises</span>
@@ -61,7 +61,7 @@ if ($id) {
             <select id="newExerciseId" class="form-input" style="margin-bottom: 8px;">
                 <option value="">Select exercise...</option>
                 <?php foreach ($exercises as $ex): ?>
-                    <option value="<?= $ex['id'] ?>"><?= $ex['name'] ?></option>
+                    <option value="<?= h($ex['id']) ?>"><?= h($ex['name']) ?></option>
                 <?php endforeach; ?>
             </select>
             <div style="display: flex; gap: 8px; margin-bottom: 8px;">
@@ -69,7 +69,7 @@ if ($id) {
                 <input type="number" id="targetReps" class="form-input" placeholder="Reps" value="8" style="flex:1">
                 <input type="number" id="targetWeight" class="form-input" placeholder="Lbs" style="flex:1">
             </div>
-            <button class="btn" style="width: 100%;" onclick="addExerciseToRoutine(<?= $routine['id'] ?>)">ADD</button>
+            <button class="btn" style="width: 100%;" onclick="addExerciseToRoutine(<?= h($routine['id']) ?>)">ADD</button>
         </div>
         
         <?php if (empty($routine['exercises'])): ?>
@@ -79,10 +79,10 @@ if ($id) {
                 <?php foreach ($routine['exercises'] as $ex): ?>
                     <li class="list-item">
                         <div>
-                            <div class="list-item-name"><?= strtoupper($ex['exercise_name']) ?></div>
+                            <div class="list-item-name"><?= strtoupper(h($ex['exercise_name'])) ?></div>
                             <div class="list-item-meta">
-                                <?= $ex['target_sets'] ?? 3 ?> sets × <?= $ex['target_reps'] ?? 8 ?> reps
-                                <?= $ex['target_weight'] ? ' @ ' . $ex['target_weight'] . ' lbs' : '' ?>
+                                <?= h($ex['target_sets'] ?? 3) ?> sets × <?= h($ex['target_reps'] ?? 8) ?> reps
+                                <?= $ex['target_weight'] ? ' @ ' . h($ex['target_weight']) . ' lbs' : '' ?>
                             </div>
                         </div>
                     </li>
@@ -106,11 +106,11 @@ if ($id) {
             </div>
         <?php else: ?>
             <?php foreach ($routines as $r): ?>
-                <a href="/?page=routines&id=<?= $r['id'] ?>" style="text-decoration: none; color: inherit;">
+                <a href="/?page=routines&id=<?= h($r['id']) ?>" style="text-decoration: none; color: inherit;">
                     <div class="list-item">
                         <div>
-                            <div class="list-item-name"><?= strtoupper($r['name']) ?></div>
-                            <div class="list-item-meta"><?= $r['description'] ?: 'No description' ?></div>
+                            <div class="list-item-name"><?= strtoupper(h($r['name'])) ?></div>
+                            <div class="list-item-meta"><?= h($r['description'] ?: 'No description') ?></div>
                         </div>
                         <span class="list-item-arrow">→</span>
                     </div>

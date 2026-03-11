@@ -3,16 +3,23 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../lib/Database.php';
 
+if (!isLoggedIn()) {
+    http_response_code(401);
+    jsonResponse(['error' => 'Unauthorized']);
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
 if ($method === 'GET' && $action === 'workouts') {
     $db = getDB();
-    $limit = $_GET['limit'] ?? 100;
+    $limit = (int)($_GET['limit'] ?? 100);
     $order = $_GET['order'] ?? 'desc';
     
     $dir = $order === 'asc' ? 'ASC' : 'DESC';
-    $stmt = $db->query("SELECT * FROM workouts ORDER BY started_at $dir LIMIT $limit");
+    $stmt = $db->prepare("SELECT * FROM workouts ORDER BY started_at $dir LIMIT ?");
+    $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+    $stmt->execute();
     $workouts = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     foreach ($workouts as &$workout) {
@@ -53,14 +60,14 @@ if ($method === 'POST' && $action === 'workouts') {
 
 if ($method === 'GET' && $action === 'workout') {
     $id = $_GET['id'] ?? null;
-    if (!$id) {
+    if (!$id || !is_numeric($id)) {
         http_response_code(400);
         jsonResponse(['error' => 'ID required']);
     }
     
     $db = getDB();
     $stmt = $db->prepare("SELECT * FROM workouts WHERE id = ?");
-    $stmt->execute([$id]);
+    $stmt->execute([(int)$id]);
     $workout = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$workout) {
@@ -128,14 +135,20 @@ if ($method === 'POST' && $action === 'sets') {
         jsonResponse(['error' => 'workout_id and exercise_id required']);
     }
     
+    $workoutId = (int)$data['workout_id'];
+    $exerciseId = (int)$data['exercise_id'];
+    $setNumber = isset($data['set_number']) ? max(1, (int)$data['set_number']) : 1;
+    $reps = isset($data['reps']) ? max(0, (int)$data['reps']) : null;
+    $weight = isset($data['weight']) ? max(0, (float)$data['weight']) : null;
+    
     $db = getDB();
     $stmt = $db->prepare("INSERT INTO workout_sets (workout_id, exercise_id, set_number, reps, weight, completed_at) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->execute([
-        $data['workout_id'],
-        $data['exercise_id'],
-        $data['set_number'] ?? 1,
-        $data['reps'] ?? null,
-        $data['weight'] ?? null,
+        $workoutId,
+        $exerciseId,
+        $setNumber,
+        $reps,
+        $weight,
         $data['completed_at'] ?? time() * 1000
     ]);
     
@@ -146,14 +159,14 @@ if ($method === 'DELETE' && $action === 'sets') {
     requireMethod('DELETE');
     $id = $_GET['id'] ?? null;
     
-    if (!$id) {
+    if (!$id || !is_numeric($id)) {
         http_response_code(400);
         jsonResponse(['error' => 'ID required']);
     }
     
     $db = getDB();
     $stmt = $db->prepare("DELETE FROM workout_sets WHERE id = ?");
-    $stmt->execute([$id]);
+    $stmt->execute([(int)$id]);
     
     jsonResponse(['success' => true]);
 }

@@ -31,7 +31,7 @@ $workouts = localApi('workouts');
         <?php foreach ($stats['volumeByExercise'] as $ex): ?>
             <div class="progress-item">
                 <div class="progress-header">
-                    <span class="progress-name"><?= strtoupper($ex['exercise_name']) ?></span>
+                    <span class="progress-name"><?= strtoupper(h($ex['exercise_name'])) ?></span>
                     <span><?= formatVolume($ex['volume']) ?> lbs</span>
                 </div>
                 <div class="progress-track">

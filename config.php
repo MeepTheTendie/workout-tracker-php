@@ -224,3 +224,65 @@ function requireMethod($method) {
         jsonResponse(['error' => 'Method not allowed']);
     }
 }
+
+function csrfToken() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (!isset($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function validateCsrfToken($token) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+function h($str) {
+    return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8');
+}
+
+function getPassword() {
+    static $password = null;
+    if ($password === null) {
+        $password = getenv('APP_PASSWORD') ?: 'GrrMeep#5Dude';
+    }
+    return $password;
+}
+
+function isLoggedIn() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    return !empty($_SESSION['authenticated']);
+}
+
+function requireAuth() {
+    if (!isLoggedIn()) {
+        header('Location: /?page=login');
+        exit;
+    }
+}
+
+function login($password) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if ($password === getPassword()) {
+        $_SESSION['authenticated'] = true;
+        return true;
+    }
+    return false;
+}
+
+function logout() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    $_SESSION = [];
+    session_destroy();
+}

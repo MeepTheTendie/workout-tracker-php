@@ -30,7 +30,7 @@ $goals = localApi('goals');
         <a href="/?page=workout" class="quick-btn">+ Log Set</a>
         <a href="/?page=history" class="quick-btn">History</a>
         <a href="/?page=stats" class="quick-btn">Stats</a>
-        <a href="/?page=goals" class="quick-btn">PRs</a>
+        <a href="/?page=goals" class="quick-btn">Goals</a>
     </div>
 </div>
 
@@ -46,10 +46,10 @@ $goals = localApi('goals');
             </li>
         <?php else: ?>
             <?php foreach (array_slice($routines, 0, 3) as $routine): ?>
-                <li class="list-item" onclick="location.href='/?page=routines&id=<?= $routine['id'] ?>'">
+                <li class="list-item" onclick="location.href='/?page=routines&id=<?= h($routine['id']) ?>'">
                     <div>
-                        <div class="list-item-name"><?= strtoupper($routine['name']) ?></div>
-                        <div class="list-item-meta"><?= $routine['description'] ?: 'No description' ?></div>
+                        <div class="list-item-name"><?= strtoupper(h($routine['name'])) ?></div>
+                        <div class="list-item-meta"><?= h($routine['description'] ?: 'No description') ?></div>
                     </div>
                     <span class="list-item-arrow">→</span>
                 </li>
@@ -73,8 +73,8 @@ $goals = localApi('goals');
         ?>
             <div class="progress-item">
                 <div class="progress-header">
-                    <span class="progress-name"><?= strtoupper($goal['exercise_name']) ?></span>
-                    <span><?= $goal['current_weight'] ?? 0 ?> / <?= $goal['target_weight'] ?> LB</span>
+                    <span class="progress-name"><?= strtoupper(h($goal['exercise_name'])) ?></span>
+                    <span><?= h($goal['current_weight'] ?? 0) ?> / <?= h($goal['target_weight']) ?> LB</span>
                 </div>
                 <div class="progress-track">
                     <div class="progress-fill" style="width: <?= min($progress, 100) ?>%"></div>

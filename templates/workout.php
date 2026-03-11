@@ -33,7 +33,7 @@ if (!empty($workouts)) {
             <select id="exerciseSelect" class="form-input">
                 <option value="">Select exercise...</option>
                 <?php foreach ($exercises as $ex): ?>
-                    <option value="<?= $ex['id'] ?>"><?= $ex['name'] ?></option>
+                    <option value="<?= h($ex['id']) ?>"><?= h($ex['name']) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -52,7 +52,7 @@ if (!empty($workouts)) {
 
 <script>
 let currentWorkoutId = <?= $currentWorkout ? $currentWorkout['id'] : 'null' ?>;
-let currentSets = <?= json_encode($currentWorkout['sets'] ?? []) ?>;
+let currentSets = <?= json_encode($currentWorkout['sets'] ?? [], JSON_HEX_TAG | JSON_HEX_APOS) ?>;
 
 function renderSets() {
     const container = document.getElementById('setsContainer');
@@ -71,9 +71,10 @@ function renderSets() {
     
     let html = '';
     for (const [exerciseName, sets] of Object.entries(grouped)) {
+        const safeName = exerciseName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
         html += `
             <div class="exercise-group">
-                <div class="exercise-name">${exerciseName.toUpperCase()}</div>
+                <div class="exercise-name">${safeName.toUpperCase()}</div>
                 <div class="sets-grid">
         `;
         sets.forEach((set, idx) => {

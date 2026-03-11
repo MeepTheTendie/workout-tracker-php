@@ -6,6 +6,13 @@ require_once __DIR__ . '/../lib/Database.php';
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
+if ($action !== 'exercises') {
+    if (!isLoggedIn()) {
+        http_response_code(401);
+        jsonResponse(['error' => 'Unauthorized']);
+    }
+}
+
 if ($method === 'GET' && $action === 'exercises') {
     $db = getDB();
     $stmt = $db->query("SELECT * FROM exercises ORDER BY name");
@@ -31,14 +38,14 @@ if ($method === 'POST' && $action === 'exercises') {
 
 if ($method === 'GET' && $action === 'exercise') {
     $id = $_GET['id'] ?? null;
-    if (!$id) {
+    if (!$id || !is_numeric($id)) {
         http_response_code(400);
         jsonResponse(['error' => 'ID required']);
     }
     
     $db = getDB();
     $stmt = $db->prepare("SELECT * FROM exercises WHERE id = ?");
-    $stmt->execute([$id]);
+    $stmt->execute([(int)$id]);
     $exercise = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$exercise) {

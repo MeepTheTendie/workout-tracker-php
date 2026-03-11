@@ -81,11 +81,11 @@ function formatDuration($started, $ended) {
     
     <?php foreach ($grouped as $exerciseName => $exSets): ?>
         <div class="exercise-group">
-            <div class="exercise-name"><?= strtoupper($exerciseName) ?></div>
+            <div class="exercise-name"><?= strtoupper(h($exerciseName)) ?></div>
             <div class="sets-grid">
                 <?php foreach ($exSets as $idx => $set): ?>
                     <div class="set-card">
-                        <span class="set-display"><?= $set['weight'] ?? 0 ?>×<?= $set['reps'] ?? 0 ?></span>
+                        <span class="set-display"><?= h($set['weight'] ?? 0) ?>×<?= h($set['reps'] ?? 0) ?></span>
                         <span style="color: var(--text-dim); font-size: 10px;">set <?= $idx + 1 ?></span>
                     </div>
                 <?php endforeach; ?>
@@ -103,6 +103,6 @@ function formatDuration($started, $ended) {
     <div class="section-header">
         <span class="section-title">Notes</span>
     </div>
-    <div style="font-size: 14px;"><?= htmlspecialchars($workout['notes']) ?></div>
+    <div style="font-size: 14px;"><?= h($workout['notes']) ?></div>
 </div>
 <?php endif; ?>

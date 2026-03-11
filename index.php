@@ -155,9 +155,19 @@ function formatVolume($vol) {
     return $vol;
 }
 
-$validPages = ['index', 'workout', 'history', 'stats', 'goals', 'routines', 'workout_detail', 'prs'];
+$validPages = ['index', 'workout', 'history', 'stats', 'goals', 'routines', 'workout_detail', 'prs', 'login'];
 if (!in_array($page, $validPages)) {
     $page = 'index';
+}
+
+if ($page !== 'login' && !isLoggedIn()) {
+    header('Location: /?page=login');
+    exit;
+}
+
+if ($page === 'login' && isLoggedIn()) {
+    header('Location: /');
+    exit;
 }
 ?>
 <!DOCTYPE html>

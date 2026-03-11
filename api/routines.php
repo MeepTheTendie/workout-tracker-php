@@ -3,6 +3,11 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../lib/Database.php';
 
+if (!isLoggedIn()) {
+    http_response_code(401);
+    jsonResponse(['error' => 'Unauthorized']);
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 

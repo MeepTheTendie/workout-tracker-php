@@ -117,7 +117,7 @@ $stats = [
                             <?php if (count($w['sets']) > 0): ?>
                                 <div style="font-size: 11px; color: var(--text-dim); display: flex; flex-wrap: wrap; gap: 4px;">
                                     <?php foreach (array_unique(array_column($w['sets'], 'exercise_name')) as $ex): ?>
-                                        <span><?= $ex ?></span><?= ', ' ?>
+                                        <span><?= h($ex) ?></span><?= ', ' ?>
                                     <?php endforeach; ?>
                                 </div>
                             <?php endif; ?>

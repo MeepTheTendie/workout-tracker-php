@@ -21,7 +21,7 @@ $completedGoals = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <select name="exercise_id" class="form-input" required>
                     <option value="">Select exercise...</option>
                     <?php foreach ($exercises as $ex): ?>
-                        <option value="<?= $ex['id'] ?>"><?= $ex['name'] ?></option>
+                        <option value="<?= h($ex['id']) ?>"><?= h($ex['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -55,13 +55,13 @@ $completedGoals = $stmt->fetchAll(PDO::FETCH_ASSOC);
         ?>
             <div class="card" style="position: relative;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div style="font-weight: 700; font-size: 14px;"><?= strtoupper($goal['exercise_name']) ?></div>
-                    <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 10px;" onclick="deleteGoal(<?= $goal['id'] ?>)">Delete</button>
+                    <div style="font-weight: 700; font-size: 14px;"><?= strtoupper(h($goal['exercise_name'])) ?></div>
+                    <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 10px;" onclick="deleteGoal(<?= h($goal['id']) ?>)">Delete</button>
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
-                    <span>Current: <strong><?= $goal['current_weight'] ?? 0 ?></strong> lbs</span>
-                    <span>Target: <strong><?= $goal['target_weight'] ?></strong> lbs</span>
+                    <span>Current: <strong><?= h($goal['current_weight'] ?? 0) ?></strong> lbs</span>
+                    <span>Target: <strong><?= h($goal['target_weight']) ?></strong> lbs</span>
                 </div>
                 
                 <div class="progress-track">
@@ -69,7 +69,7 @@ $completedGoals = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 
                 <?php if ($progress >= 100): ?>
-                    <button class="btn" style="margin-top: 12px; width: 100%;" onclick="completeGoal(<?= $goal['id'] ?>)">Mark Complete!</button>
+                    <button class="btn" style="margin-top: 12px; width: 100%;" onclick="completeGoal(<?= h($goal['id']) ?>)">Mark Complete!</button>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
@@ -86,10 +86,10 @@ $completedGoals = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="card" style="opacity: 0.6;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <div style="font-weight: 700; font-size: 14px; text-decoration: line-through;"><?= strtoupper($goal['exercise_name']) ?></div>
-                        <div style="font-size: 11px; color: var(--text-dim);">Achieved: <?= $goal['target_weight'] ?> lbs × <?= $goal['target_reps'] ?> reps</div>
+                        <div style="font-weight: 700; font-size: 14px; text-decoration: line-through;"><?= strtoupper(h($goal['exercise_name'])) ?></div>
+                        <div style="font-size: 11px; color: var(--text-dim);">Achieved: <?= h($goal['target_weight']) ?> lbs × <?= h($goal['target_reps']) ?> reps</div>
                     </div>
-                    <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 10px;" onclick="deleteGoal(<?= $goal['id'] ?>)">Delete</button>
+                    <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 10px;" onclick="deleteGoal(<?= h($goal['id']) ?>)">Delete</button>
                 </div>
             </div>
         <?php endforeach; ?>
