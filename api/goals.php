@@ -35,7 +35,6 @@ if ($method === 'GET' && $action === 'goals') {
 }
 
 if ($method === 'POST' && $action === 'goals') {
-    requireMethod('POST');
     $data = json_decode(file_get_contents('php://input'), true);
     
     if (empty($data['exercise_id']) || empty($data['target_weight'])) {
@@ -66,7 +65,6 @@ if ($method === 'POST' && $action === 'goals') {
 }
 
 if ($method === 'PATCH' && $action === 'goals') {
-    requireMethod('PATCH');
     $data = json_decode(file_get_contents('php://input'), true);
     
     if (empty($data['id']) || !is_numeric($data['id'])) {
@@ -95,7 +93,6 @@ if ($method === 'PATCH' && $action === 'goals') {
 }
 
 if ($method === 'DELETE' && $action === 'goals') {
-    requireMethod('DELETE');
     $id = $_GET['id'] ?? null;
     
     if (!$id || !is_numeric($id)) {

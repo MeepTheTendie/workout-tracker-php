@@ -287,3 +287,9 @@ function logout() {
     $_SESSION = [];
     session_destroy();
 }
+
+function formatVolume($vol) {
+    if ($vol >= 1000000) return round($vol / 1000000, 1) . 'M';
+    if ($vol >= 1000) return round($vol / 1000) . 'k';
+    return $vol;
+}

@@ -32,7 +32,6 @@ if ($method === 'GET' && $action === 'routines') {
 }
 
 if ($method === 'POST' && $action === 'routines') {
-    requireMethod('POST');
     $data = json_decode(file_get_contents('php://input'), true);
     
     if (empty($data['name'])) {
@@ -49,7 +48,7 @@ if ($method === 'POST' && $action === 'routines') {
 
 if ($method === 'GET' && $action === 'routine') {
     $id = $_GET['id'] ?? null;
-    if (!$id) {
+    if (!$id || !is_numeric($id)) {
         http_response_code(400);
         jsonResponse(['error' => 'ID required']);
     }
@@ -78,7 +77,6 @@ if ($method === 'GET' && $action === 'routine') {
 }
 
 if ($method === 'DELETE' && $action === 'routines') {
-    requireMethod('DELETE');
     $id = $_GET['id'] ?? null;
     
     if (!$id) {
@@ -94,7 +92,6 @@ if ($method === 'DELETE' && $action === 'routines') {
 }
 
 if ($method === 'POST' && $action === 'routine-exercises') {
-    requireMethod('POST');
     $data = json_decode(file_get_contents('php://input'), true);
     
     if (empty($data['routine_id']) || empty($data['exercise_id'])) {

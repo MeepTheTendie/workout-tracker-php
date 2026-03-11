@@ -21,7 +21,6 @@ if ($method === 'GET' && $action === 'exercises') {
 }
 
 if ($method === 'POST' && $action === 'exercises') {
-    requireMethod('POST');
     $data = json_decode(file_get_contents('php://input'), true);
     
     if (empty($data['name']) || empty($data['category'])) {

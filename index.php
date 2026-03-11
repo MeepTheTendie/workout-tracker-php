@@ -149,12 +149,6 @@ function localApi($endpoint, $id = null) {
     return null;
 }
 
-function formatVolume($vol) {
-    if ($vol >= 1000000) return round($vol / 1000000, 1) . 'M';
-    if ($vol >= 1000) return round($vol / 1000) . 'k';
-    return $vol;
-}
-
 $validPages = ['index', 'workout', 'history', 'stats', 'goals', 'routines', 'workout_detail', 'prs', 'login'];
 if (!in_array($page, $validPages)) {
     $page = 'index';

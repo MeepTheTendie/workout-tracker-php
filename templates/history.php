@@ -116,8 +116,12 @@ $stats = [
                             
                             <?php if (count($w['sets']) > 0): ?>
                                 <div style="font-size: 11px; color: var(--text-dim); display: flex; flex-wrap: wrap; gap: 4px;">
-                                    <?php foreach (array_unique(array_column($w['sets'], 'exercise_name')) as $ex): ?>
-                                        <span><?= h($ex) ?></span><?= ', ' ?>
+                                    <?php 
+                                    $exercises = array_unique(array_column($w['sets'], 'exercise_name'));
+                                    $lastKey = array_key_last($exercises);
+                                    foreach ($exercises as $key => $ex): 
+                                    ?>
+                                        <span><?= h($ex) ?></span><?= $key !== $lastKey ? ', ' : '' ?>
                                     <?php endforeach; ?>
                                 </div>
                             <?php endif; ?>

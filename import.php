@@ -2,6 +2,13 @@
 
 require_once __DIR__ . '/config.php';
 
+// This script should only be run from command line or by authenticated users
+if (php_sapi_name() !== 'cli' && !isLoggedIn()) {
+    http_response_code(401);
+    echo "Unauthorized\n";
+    exit(1);
+}
+
 $exercisesJson = file_get_contents('/tmp/workout-tracker/exercises-import.json');
 $workoutsJson = file_get_contents('/tmp/workout-tracker/workouts-import.json');
 $setsJson = file_get_contents('/tmp/workout-tracker/sets-import.json');
