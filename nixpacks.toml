@@ -1,8 +1,0 @@
-[phases.build]
-cmds = ["echo 'Build complete'"]
-
-[phases.setup]
-nixPkgs = ["php", "phpExtensions.pdo_sqlite", "phpExtensions.pgsql", "phpExtensions.pdo_pgsql"]
-
-[start]
-cmd = "php -S 0.0.0.0:$PORT"
