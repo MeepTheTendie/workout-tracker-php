@@ -1,11 +1,19 @@
 <?php
 
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../lib/Database.php';
+try {
+    require_once __DIR__ . '/../config.php';
+    require_once __DIR__ . '/../lib/Database.php';
 
-if (!isLoggedIn()) {
-    http_response_code(401);
-    jsonResponse(['error' => 'Unauthorized']);
+    if (!isLoggedIn()) {
+        http_response_code(401);
+        jsonResponse(['error' => 'Unauthorized']);
+    }
+} catch (Exception $e) {
+    error_log("Fatal error in workouts API: " . $e->getMessage());
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Server initialization error: ' . $e->getMessage()]);
+    exit;
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -44,18 +52,37 @@ if ($method === 'GET' && $action === 'workouts') {
 
 if ($method === 'POST' && $action === 'workouts') {
     requireMethod('POST');
-    $data = json_decode(file_get_contents('php://input'), true);
     
-    $db = getDB();
-    $stmt = $db->prepare("INSERT INTO workouts (routine_id, started_at, ended_at, notes) VALUES (?, ?, ?, ?)");
-    $stmt->execute([
-        $data['routine_id'] ?? null,
-        $data['started_at'] ?? time() * 1000,
-        $data['ended_at'] ?? null,
-        $data['notes'] ?? null
-    ]);
-    
-    jsonResponse(['id' => $db->lastInsertId()]);
+    try {
+        $input = file_get_contents('php://input');
+        error_log("POST workouts input: " . $input);
+        $data = json_decode($input, true);
+        
+        if (!$data) {
+            throw new Exception('Invalid JSON input: ' . json_last_error_msg());
+        }
+        
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO workouts (routine_id, started_at, ended_at, notes) VALUES (?, ?, ?, ?)");
+        $result = $stmt->execute([
+            $data['routine_id'] ?? null,
+            $data['started_at'] ?? time() * 1000,
+            $data['ended_at'] ?? null,
+            $data['notes'] ?? null
+        ]);
+        
+        if (!$result) {
+            throw new Exception('Failed to insert workout: ' . print_r($stmt->errorInfo(), true));
+        }
+        
+        $id = $db->lastInsertId();
+        error_log("Workout created with ID: " . $id);
+        jsonResponse(['id' => $id]);
+    } catch (Exception $e) {
+        error_log("Error in POST workouts: " . $e->getMessage());
+        http_response_code(500);
+        jsonResponse(['error' => $e->getMessage()]);
+    }
 }
 
 if ($method === 'GET' && $action === 'workout') {

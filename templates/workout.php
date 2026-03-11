@@ -118,13 +118,20 @@ function renderSets() {
             });
             console.log('Response status:', res.status);
             
+            const text = await res.text();
+            console.log('Response text:', text);
+            
             if (!res.ok) {
-                const text = await res.text();
                 console.error('Error response:', text);
-                throw new Error(`HTTP error! status: ${res.status}, body: ${text}`);
+                throw new Error(`HTTP error! status: ${res.status}, body: ${text || '(empty)'}`);
             }
             
-            const data = await res.json();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (parseErr) {
+                throw new Error(`Invalid JSON response: ${text || '(empty)'}`);
+            }
             console.log('Response data:', data);
             
             if (!data.id) {
