@@ -98,43 +98,86 @@ function renderSets() {
     container.innerHTML = html;
 }
 
-document.getElementById('startWorkoutBtn')?.addEventListener('click', async () => {
-    const res = await fetch('/api/workouts.php?action=workouts', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({started_at: Date.now()})
+(function() {
+    const btn = document.getElementById('startWorkoutBtn');
+    if (!btn) {
+        console.error('Start workout button not found in DOM!');
+        return;
+    }
+    console.log('Start workout button found, attaching listener');
+    
+    btn.addEventListener('click', async function(e) {
+        console.log('Start workout clicked');
+        e.preventDefault();
+        
+        try {
+            const res = await fetch('/api/workouts.php?action=workouts', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({started_at: Date.now()})
+            });
+            console.log('Response status:', res.status);
+            
+            if (!res.ok) {
+                const text = await res.text();
+                console.error('Error response:', text);
+                throw new Error(`HTTP error! status: ${res.status}, body: ${text}`);
+            }
+            
+            const data = await res.json();
+            console.log('Response data:', data);
+            
+            if (!data.id) {
+                throw new Error('No workout ID returned from server: ' + JSON.stringify(data));
+            }
+            
+            currentWorkoutId = parseInt(data.id);
+            document.getElementById('startWorkoutBtn').style.display = 'none';
+            document.getElementById('activeWorkout').style.display = 'block';
+            renderSets();
+            startTimer();
+            console.log('Workout started successfully');
+        } catch (err) {
+            console.error('Failed to start workout:', err);
+            alert('Failed to start workout: ' + err.message);
+        }
     });
-    const data = await res.json();
-    currentWorkoutId = parseInt(data.id);
-    document.getElementById('startWorkoutBtn').style.display = 'none';
-    document.getElementById('activeWorkout').style.display = 'block';
-    renderSets();
-    startTimer();
-});
+})();
 
 document.getElementById('addExerciseBtn')?.addEventListener('click', async () => {
     const exerciseId = document.getElementById('exerciseSelect').value;
     if (!exerciseId || !currentWorkoutId) return;
     
-    const res = await fetch('/api/workouts.php?action=sets', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            workout_id: currentWorkoutId,
-            exercise_id: exerciseId,
-            set_number: 1,
-            completed_at: Date.now()
-        })
-    });
-    const data = await res.json();
-    currentSets.push({
-        id: data.id,
-        exercise_id: parseInt(exerciseId),
-        exercise_name: document.getElementById('exerciseSelect').options[document.getElementById('exerciseSelect').selectedIndex].text,
-        weight: 0,
-        reps: 0
-    });
-    renderSets();
+    try {
+        const res = await fetch('/api/workouts.php?action=sets', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                workout_id: currentWorkoutId,
+                exercise_id: exerciseId,
+                set_number: 1,
+                completed_at: Date.now()
+            })
+        });
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+        if (!data.id) {
+            throw new Error('No set ID returned from server');
+        }
+        currentSets.push({
+            id: data.id,
+            exercise_id: parseInt(exerciseId),
+            exercise_name: document.getElementById('exerciseSelect').options[document.getElementById('exerciseSelect').selectedIndex].text,
+            weight: 0,
+            reps: 0
+        });
+        renderSets();
+    } catch (err) {
+        console.error('Failed to add exercise:', err);
+        alert('Failed to add exercise. Please try again.');
+    }
 });
 
 async function addSet(exerciseId) {
@@ -171,12 +214,20 @@ async function deleteSet(setId) {
 }
 
 document.getElementById('finishWorkoutBtn')?.addEventListener('click', async () => {
-    await fetch('/api/workouts.php?action=workouts', {
-        method: 'PATCH',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({id: currentWorkoutId, ended_at: Date.now()})
-    });
-    location.href = '/?page=history';
+    try {
+        const res = await fetch('/api/workouts.php?action=workouts', {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id: currentWorkoutId, ended_at: Date.now()})
+        });
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        location.href = '/?page=history';
+    } catch (err) {
+        console.error('Failed to finish workout:', err);
+        alert('Failed to finish workout. Please try again.');
+    }
 });
 
 function startTimer() {
