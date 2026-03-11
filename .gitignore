@@ -4,3 +4,5 @@
 vendor/
 .phpunit.cache/
 composer.lock
+.env
+.env.local
