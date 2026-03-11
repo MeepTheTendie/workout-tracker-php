@@ -40,6 +40,7 @@ function getDB() {
             );
             $db = new PDO($dsn, $parsed['user'] ?? null, $parsed['pass'] ?? null);
             $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            initPostgresDB($db);
         } else {
             $db = new PDO('sqlite:' . DB_PATH);
             $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
