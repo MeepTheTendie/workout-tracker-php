@@ -1,5 +1,17 @@
 <?php
 
+// Session security configuration
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
+ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.use_strict_mode', 1);
+
+// Security headers
+header('X-Frame-Options: DENY');
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'self';");
+
 $dbType = getenv('DATABASE_URL') ? 'pgsql' : 'sqlite';
 
 if ($dbType === 'pgsql') {
@@ -250,7 +262,10 @@ function h($str) {
 function getPassword() {
     static $password = null;
     if ($password === null) {
-        $password = getenv('APP_PASSWORD') ?: 'GrrMeep#5Dude';
+        $password = getenv('APP_PASSWORD');
+        if (!$password) {
+            throw new Exception('APP_PASSWORD environment variable must be set');
+        }
     }
     return $password;
 }
