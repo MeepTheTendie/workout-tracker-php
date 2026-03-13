@@ -15,8 +15,6 @@ class Goal extends Model
     protected $casts = [
         'target_weight' => 'decimal:2',
         'completed' => 'boolean',
-        'created_at' => 'integer',
-        'updated_at' => 'integer',
     ];
 
     public function user(): BelongsTo

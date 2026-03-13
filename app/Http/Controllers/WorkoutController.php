@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddSetRequest;
+use App\Http\Requests\StoreWorkoutRequest;
 use App\Models\Exercise;
 use App\Models\Workout;
 use App\Models\WorkoutSet;
@@ -10,11 +12,6 @@ use Illuminate\Support\Facades\Auth;
 
 class WorkoutController extends Controller
 {
-    public function __construct()
-    {
-        // Middleware applied in routes
-    }
-
     public function index()
     {
         $workouts = Auth::user()->workouts()
@@ -38,7 +35,7 @@ class WorkoutController extends Controller
         return view('workouts.create', compact('exercises'));
     }
 
-    public function store(Request $request)
+    public function store(StoreWorkoutRequest $request)
     {
         $workout = Auth::user()->workouts()->create([
             'started_at' => round(microtime(true) * 1000),
@@ -90,17 +87,13 @@ class WorkoutController extends Controller
     }
     
     // API methods for AJAX
-    public function addSet(Request $request, Workout $workout)
+    public function addSet(AddSetRequest $request, Workout $workout)
     {
         $this->authorize('update', $workout);
         
-        $set = $workout->sets()->create([
-            'exercise_id' => $request->exercise_id,
-            'set_number' => $request->set_number ?? 1,
-            'reps' => $request->reps,
-            'weight' => $request->weight,
+        $set = $workout->sets()->create(array_merge($request->validated(), [
             'completed_at' => round(microtime(true) * 1000),
-        ]);
+        ]));
         
         return response()->json(['id' => $set->id]);
     }

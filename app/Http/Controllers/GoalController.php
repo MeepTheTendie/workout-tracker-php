@@ -2,32 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreGoalRequest;
 use App\Models\Goal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class GoalController extends Controller
 {
-    public function __construct()
-    {
-        // Middleware applied in routes
-    }
-
     public function index()
     {
-        return view('goals.index');
+        $goals = Auth::user()->goals()->with('exercise')->get();
+        return view('goals.index', compact('goals'));
     }
 
-    public function store(Request $request)
+    public function store(StoreGoalRequest $request)
     {
-        $goal = Auth::user()->goals()->create([
-            'exercise_id' => $request->exercise_id,
-            'target_weight' => $request->target_weight,
-            'target_reps' => $request->target_reps ?? 1,
-            'completed' => false,
-            'created_at' => round(microtime(true) * 1000),
-            'updated_at' => round(microtime(true) * 1000),
-        ]);
+        $goal = Auth::user()->goals()->create($request->validated());
 
         return response()->json(['id' => $goal->id]);
     }
@@ -42,10 +32,7 @@ class GoalController extends Controller
     public function complete(Goal $goal)
     {
         $this->authorize('update', $goal);
-        $goal->update([
-            'completed' => true,
-            'updated_at' => round(microtime(true) * 1000),
-        ]);
+        $goal->update(['completed' => true]);
         return response()->json(['success' => true]);
     }
 }

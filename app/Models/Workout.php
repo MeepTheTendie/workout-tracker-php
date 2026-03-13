@@ -14,8 +14,8 @@ class Workout extends Model
     protected $fillable = ['user_id', 'started_at', 'ended_at', 'notes'];
 
     protected $casts = [
-        'started_at' => 'integer',
-        'ended_at' => 'integer',
+        'started_at' => 'timestamp',
+        'ended_at' => 'timestamp',
     ];
 
     public function user(): BelongsTo
@@ -50,16 +50,22 @@ class Workout extends Model
         if (!$this->ended_at || !$this->started_at) {
             return null;
         }
-        return (int) (($this->ended_at - $this->started_at) / 60000);
+        $start = $this->started_at instanceof \Carbon\Carbon ? $this->started_at->timestamp : $this->started_at;
+        $end = $this->ended_at instanceof \Carbon\Carbon ? $this->ended_at->timestamp : $this->ended_at;
+        return (int) (($end - $start) / 60);
     }
 
     public function getStartedAtFormattedAttribute(): string
     {
-        return $this->started_at ? date('M j, Y g:i A', $this->started_at / 1000) : '';
+        if (!$this->started_at) return '';
+        $timestamp = $this->started_at instanceof \Carbon\Carbon ? $this->started_at->timestamp : $this->started_at;
+        return date('M j, Y g:i A', $timestamp);
     }
 
     public function getEndedAtFormattedAttribute(): ?string
     {
-        return $this->ended_at ? date('M j, Y g:i A', $this->ended_at / 1000) : null;
+        if (!$this->ended_at) return null;
+        $timestamp = $this->ended_at instanceof \Carbon\Carbon ? $this->ended_at->timestamp : $this->ended_at;
+        return date('M j, Y g:i A', $timestamp);
     }
 }

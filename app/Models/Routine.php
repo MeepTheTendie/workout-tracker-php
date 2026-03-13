@@ -13,11 +13,6 @@ class Routine extends Model
 
     protected $fillable = ['user_id', 'name', 'description', 'created_at', 'updated_at'];
 
-    protected $casts = [
-        'created_at' => 'integer',
-        'updated_at' => 'integer',
-    ];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -14,8 +14,6 @@ class RoutineExercise extends Model
 
     protected $casts = [
         'target_weight' => 'decimal:2',
-        'created_at' => 'integer',
-        'updated_at' => 'integer',
     ];
 
     public function routine(): BelongsTo

@@ -19,14 +19,20 @@ Route::get('/login', function () {
 })->name('login');
 
 Route::post('/login', function (\Illuminate\Http\Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+    
     $credentials = $request->only('email', 'password');
     
     if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
         return redirect()->route('dashboard');
     }
     
     return back()->withErrors(['email' => 'Invalid credentials']);
-});
+})->middleware('throttle:5,1');
 
 Route::post('/logout', function () {
     Auth::logout();

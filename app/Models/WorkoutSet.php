@@ -13,7 +13,7 @@ class WorkoutSet extends Model
     protected $fillable = ['workout_id', 'exercise_id', 'set_number', 'reps', 'weight', 'completed_at'];
 
     protected $casts = [
-        'completed_at' => 'integer',
+        'completed_at' => 'timestamp',
         'weight' => 'decimal:2',
     ];
 
@@ -34,6 +34,8 @@ class WorkoutSet extends Model
 
     public function getCompletedAtFormattedAttribute(): string
     {
-        return $this->completed_at ? date('g:i A', $this->completed_at / 1000) : '';
+        if (!$this->completed_at) return '';
+        $timestamp = $this->completed_at instanceof \Carbon\Carbon ? $this->completed_at->timestamp : $this->completed_at;
+        return date('g:i A', $timestamp);
     }
 }
