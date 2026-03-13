@@ -38,7 +38,7 @@ $recentWorkouts = auth()->user()->workouts()->completed()->with('sets.exercise')
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <div style="font-weight: 700;">{{ $workout->notes ?? 'Workout #' . $workout->id }}</div>
-                        <div style="font-size: 12px; color: var(--text-dim);">{{ $workout->started_at->format('M d, Y') }}</div>
+                        <div style="font-size: 12px; color: var(--text-dim);">{{ date('M d, Y', $workout->started_at / 1000) }}</div>
                     </div>
                     <div style="text-align: right;">
                         <div style="font-size: 12px; color: var(--text-dim);">{{ $workout->sets->count() }} sets</div>

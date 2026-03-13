@@ -14,8 +14,8 @@ class Workout extends Model
     protected $fillable = ['user_id', 'started_at', 'ended_at', 'notes'];
 
     protected $casts = [
-        'started_at' => 'datetime',
-        'ended_at' => 'datetime',
+        'started_at' => 'integer',
+        'ended_at' => 'integer',
     ];
 
     public function user(): BelongsTo
@@ -50,6 +50,16 @@ class Workout extends Model
         if (!$this->ended_at || !$this->started_at) {
             return null;
         }
-        return $this->ended_at->diffInMinutes($this->started_at);
+        return (int) (($this->ended_at - $this->started_at) / 60000);
+    }
+
+    public function getStartedAtFormattedAttribute(): string
+    {
+        return $this->started_at ? date('M j, Y g:i A', $this->started_at / 1000) : '';
+    }
+
+    public function getEndedAtFormattedAttribute(): ?string
+    {
+        return $this->ended_at ? date('M j, Y g:i A', $this->ended_at / 1000) : null;
     }
 }

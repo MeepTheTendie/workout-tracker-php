@@ -15,8 +15,9 @@ return new class extends Migration
             $table->integer('set_number');
             $table->integer('reps')->nullable();
             $table->decimal('weight', 8, 2)->nullable();
-            $table->timestamp('completed_at');
-            $table->timestamps();
+            $table->unsignedBigInteger('completed_at');
+            $table->unsignedBigInteger('created_at')->nullable();
+            $table->unsignedBigInteger('updated_at')->nullable();
         });
     }
 

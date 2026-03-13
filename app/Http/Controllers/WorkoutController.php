@@ -12,7 +12,7 @@ class WorkoutController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        // Middleware applied in routes
     }
 
     public function index()
@@ -41,7 +41,7 @@ class WorkoutController extends Controller
     public function store(Request $request)
     {
         $workout = Auth::user()->workouts()->create([
-            'started_at' => now(),
+            'started_at' => round(microtime(true) * 1000),
             'notes' => $request->notes,
         ]);
         
@@ -70,7 +70,7 @@ class WorkoutController extends Controller
         $this->authorize('update', $workout);
         
         if ($request->has('ended_at')) {
-            $workout->update(['ended_at' => now()]);
+            $workout->update(['ended_at' => round(microtime(true) * 1000)]);
         }
         
         if ($request->has('notes')) {
@@ -99,7 +99,7 @@ class WorkoutController extends Controller
             'set_number' => $request->set_number ?? 1,
             'reps' => $request->reps,
             'weight' => $request->weight,
-            'completed_at' => now(),
+            'completed_at' => round(microtime(true) * 1000),
         ]);
         
         return response()->json(['id' => $set->id]);

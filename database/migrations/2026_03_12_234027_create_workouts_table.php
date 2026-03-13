@@ -11,10 +11,11 @@ return new class extends Migration
         Schema::create('workouts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->timestamp('started_at');
-            $table->timestamp('ended_at')->nullable();
+            $table->unsignedBigInteger('started_at');
+            $table->unsignedBigInteger('ended_at')->nullable();
             $table->string('notes')->nullable();
-            $table->timestamps();
+            $table->unsignedBigInteger('created_at')->nullable();
+            $table->unsignedBigInteger('updated_at')->nullable();
         });
     }
 
