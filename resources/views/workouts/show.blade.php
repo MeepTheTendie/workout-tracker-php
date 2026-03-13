@@ -41,6 +41,14 @@
         font-size: 12px;
         color: #666;
         margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .workout-duration svg {
+        width: 14px;
+        height: 14px;
     }
     
     /* Stats Grid */
@@ -144,6 +152,14 @@
         text-transform: uppercase;
         letter-spacing: 1px;
         margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .notes-label svg {
+        width: 14px;
+        height: 14px;
     }
     
     .notes-content {
@@ -173,6 +189,15 @@
         cursor: pointer;
         text-decoration: none;
         text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .detail-action-btn svg {
+        width: 16px;
+        height: 16px;
     }
     
     .detail-action-btn.delete {
@@ -204,7 +229,13 @@ $dateStr = date('F j, Y', $timestamp);
 <!-- Workout Header -->
 <div class="workout-header-card">
     <div class="workout-date-display">{{ $dayName }}, {{ date('M j, Y', $timestamp) }}</div>
-    <div class="workout-duration">Duration: {{ floor($workout->duration / 60000) }} minutes</div>
+    <div class="workout-duration">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Duration: {{ floor($workout->duration / 60000) }} minutes
+    </div>
     
     <div class="stats-grid">
         <div class="stat-box">
@@ -227,13 +258,9 @@ $dateStr = date('F j, Y', $timestamp);
     @endphp
     <div class="exercise-card">
         <div class="exercise-header">
+            <!-- Dumbbell Icon -->
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-                <path d="M4 22h16"/>
-                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                <path d="M6 5v14M18 5v14M3 8h18M3 16h18"/>
             </svg>
             {{ $exercise->name }}
         </div>
@@ -251,15 +278,35 @@ $dateStr = date('F j, Y', $timestamp);
 <!-- Notes -->
 @if($workout->notes)
     <div class="notes-section">
-        <div class="notes-label">NOTES</div>
+        <div class="notes-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            NOTES
+        </div>
         <div class="notes-content">{{ $workout->notes }}</div>
     </div>
 @endif
 
 <!-- Actions -->
 <div class="detail-actions">
-    <a href="/workouts/create" class="detail-action-btn">Repeat Workout</a>
-    <button class="detail-action-btn delete" onclick="deleteWorkout()">Delete</button>
+    <a href="/workouts/create" class="detail-action-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        Repeat
+    </a>
+    <button class="detail-action-btn delete" onclick="deleteWorkout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+        Delete
+    </button>
 </div>
 @endsection
 

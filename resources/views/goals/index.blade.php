@@ -127,9 +127,18 @@
     }
     
     .goal-exercise {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         font-size: 14px;
         font-weight: 700;
         color: var(--text);
+    }
+    
+    .goal-exercise svg {
+        width: 18px;
+        height: 18px;
+        color: var(--accent);
     }
     
     .goal-stats {
@@ -176,6 +185,15 @@
         letter-spacing: 1px;
         cursor: pointer;
         margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .add-goal-btn svg {
+        width: 16px;
+        height: 16px;
     }
     
     /* Empty State */
@@ -233,6 +251,9 @@
         border-radius: 6px;
         color: var(--text);
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .form-row {
@@ -267,8 +288,14 @@ $exercises = App\Models\Exercise::orderBy('name')->get();
     <h1 class="page-title">MY GOALS</h1>
 </div>
 
-<!-- Add Goal Button -->
-<button class="add-goal-btn" onclick="showAddGoalModal()">ADD GOAL</button>
+<!-- Add Goal Button with Plus Icon -->
+<button class="add-goal-btn" onclick="showAddGoalModal()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    ADD GOAL
+</button>
 
 <!-- Goals Container -->
 <div class="goals-container">
@@ -316,7 +343,15 @@ $exercises = App\Models\Exercise::orderBy('name')->get();
             @endphp
             <div class="goal-card" style="background: #f5f5f5; border: 1px solid #e0e0e0;">
                 <div class="goal-card-header">
-                    <span class="goal-exercise" style="color: #1a1a1a;">{{ $goal->exercise->name }}</span>
+                    <span class="goal-exercise" style="color: #1a1a1a;">
+                        <!-- Target Icon -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <circle cx="12" cy="12" r="6"/>
+                            <circle cx="12" cy="12" r="2"/>
+                        </svg>
+                        {{ $goal->exercise->name }}
+                    </span>
                 </div>
                 <div class="goal-stats">
                     <span class="goal-stat-label" style="color: #666;">Current: <span class="goal-stat-value" style="color: #1a1a1a;">{{ $currentWeight }} lbs</span></span>
@@ -340,7 +375,15 @@ $exercises = App\Models\Exercise::orderBy('name')->get();
         @endphp
         <div class="goal-card">
             <div class="goal-card-header">
-                <span class="goal-exercise">{{ $goal->exercise->name }}</span>
+                <span class="goal-exercise">
+                    <!-- Target Icon -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="6"/>
+                        <circle cx="12" cy="12" r="2"/>
+                    </svg>
+                    {{ $goal->exercise->name }}
+                </span>
                 <button class="icon-btn" onclick="deleteGoal({{ $goal->id }})" style="padding: 4px 8px; font-size: 10px;">Delete</button>
             </div>
             <div class="goal-stats">

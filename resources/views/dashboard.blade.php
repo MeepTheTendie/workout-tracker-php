@@ -161,7 +161,7 @@
         gap: 4px;
     }
     
-    /* Muscle Tags */
+    /* Muscle Tags with Icons */
     .muscle-tags {
         display: flex;
         flex-wrap: wrap;
@@ -177,6 +177,11 @@
         font-size: 10px;
         font-weight: 600;
         text-transform: lowercase;
+    }
+    
+    .muscle-tag svg {
+        width: 12px;
+        height: 12px;
     }
     
     .muscle-tag.leg {
@@ -202,11 +207,6 @@
     .muscle-tag.arms {
         background: #e2e3e5;
         color: #383d41;
-    }
-    
-    .muscle-tag svg {
-        width: 12px;
-        height: 12px;
     }
     
     /* Empty State */
@@ -261,9 +261,10 @@ $recentWorkouts = auth()->user()->workouts()->completed()->with('sets.exercise')
     </div>
 </div>
 
-<!-- Action Buttons -->
+<!-- Action Buttons with Icons -->
 <div class="action-buttons">
     <a href="/goals" class="action-btn-card">
+        <!-- Target/Goal Icon -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/>
             <circle cx="12" cy="12" r="6"/>
@@ -272,6 +273,7 @@ $recentWorkouts = auth()->user()->workouts()->completed()->with('sets.exercise')
         GOALS
     </a>
     <a href="/routines" class="action-btn-card">
+        <!-- Calendar/Routine Icon -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
             <line x1="16" y1="2" x2="16" y2="6"/>
@@ -324,15 +326,14 @@ $recentWorkouts = auth()->user()->workouts()->completed()->with('sets.exercise')
                 </div>
                 <div class="workout-item-stats">
                     <span class="workout-item-stat">
+                        <!-- Dumbbell Icon -->
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-                            <path d="M4 22h16"/>
-                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                            <path d="M6 5v14M18 5v14M3 8h18M3 16h18"/>
                         </svg>
                         {{ $workout->sets->count() }} sets
                     </span>
                     <span class="workout-item-stat">
+                        <!-- Chart/Volume Icon -->
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="20" x2="18" y2="10"/>
                             <line x1="12" y1="20" x2="12" y2="4"/>
@@ -345,6 +346,33 @@ $recentWorkouts = auth()->user()->workouts()->completed()->with('sets.exercise')
                     <div class="muscle-tags">
                         @foreach($muscleGroups as $muscle)
                             <span class="muscle-tag {{ $muscle }}">
+                                @if($muscle === 'leg')
+                                    <!-- Leg Icon -->
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 3v18M8 21l4-4 4 4M8 3l4 4 4-4"/>
+                                    </svg>
+                                @elseif($muscle === 'chest')
+                                    <!-- Chest Icon -->
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 12V8h-4V4h-4v4H8V4H4v8h4v4h4v4h4v-4h4v-4z"/>
+                                    </svg>
+                                @elseif($muscle === 'back')
+                                    <!-- Back Icon -->
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                    </svg>
+                                @elseif($muscle === 'shoulders')
+                                    <!-- Shoulders Icon -->
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"/>
+                                        <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                                    </svg>
+                                @elseif($muscle === 'arms')
+                                    <!-- Arms Icon -->
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M8 6v12M16 6v12M4 10h16M4 14h16"/>
+                                    </svg>
+                                @endif
                                 {{ $muscle }}
                             </span>
                         @endforeach

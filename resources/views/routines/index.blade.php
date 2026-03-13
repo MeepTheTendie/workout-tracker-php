@@ -280,6 +280,9 @@
         border-radius: 6px;
         color: var(--text);
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>
 @endsection
@@ -359,6 +362,7 @@ $exercises = App\Models\Exercise::orderBy('name')->get();
                 <div class="routine-card-header" onclick="toggleRoutine({{ $routine->id }})">
                     <div class="routine-card-info">
                         <div class="routine-icon" style="background: #fff;">
+                            <!-- Calendar Icon -->
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                                 <line x1="16" y1="2" x2="16" y2="6"/>
@@ -404,6 +408,7 @@ $exercises = App\Models\Exercise::orderBy('name')->get();
             <div class="routine-card-header" onclick="toggleRoutineList({{ $routine->id }})">
                 <div class="routine-card-info">
                     <div class="routine-icon">
+                        <!-- Calendar Icon -->
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                             <line x1="16" y1="2" x2="16" y2="6"/>
