@@ -270,14 +270,21 @@ $recentWorkouts = auth()->user()->workouts()->completed()->with('sets.exercise')
 
 // Get volume trend for last 7 days
 $volumeTrend = [];
+$startOfWeek = now()->subDays(6)->startOfDay()->timestamp * 1000;
+$weekWorkouts = auth()->user()->workouts()
+    ->completed()
+    ->where('started_at', '>=', $startOfWeek)
+    ->with('sets')
+    ->get();
+
 for ($i = 6; $i >= 0; $i--) {
     $date = now()->subDays($i);
-    $dayWorkouts = auth()->user()->workouts()
-        ->completed()
-        ->whereDate('started_at', '>=', $date->startOfDay()->timestamp * 1000)
-        ->whereDate('started_at', '<=', $date->endOfDay()->timestamp * 1000)
-        ->with('sets')
-        ->get();
+    $dayStart = $date->startOfDay()->timestamp * 1000;
+    $dayEnd = $date->endOfDay()->timestamp * 1000;
+    
+    $dayWorkouts = $weekWorkouts->filter(function ($w) use ($dayStart, $dayEnd) {
+        return $w->started_at >= $dayStart && $w->started_at <= $dayEnd;
+    });
     
     $dayVolume = $dayWorkouts->sum(function ($w) {
         return $w->sets->sum(fn($s) => ($s->weight ?? 0) * ($s->reps ?? 0));
