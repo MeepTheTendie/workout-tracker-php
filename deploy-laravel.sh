@@ -57,10 +57,13 @@ ssh $SERVER "
     tar -xzf /tmp/laravel-deploy.tar.gz
     cp .env.production .env
     
-    # Create storage directories
+    # Create storage directories and set permissions
     mkdir -p storage/framework/{cache,sessions,views}
     mkdir -p storage/logs
+    chown -R www-data:www-data storage
     chmod -R 775 storage
+    chown -R www-data:www-data bootstrap/cache
+    chmod -R 775 bootstrap/cache
     
     # Create database
     sudo -u postgres psql -c 'CREATE DATABASE workout_tracker_laravel;' 2>/dev/null || echo 'DB exists'
