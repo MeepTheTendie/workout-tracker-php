@@ -19,6 +19,16 @@ class User extends Authenticatable
         return $this->hasMany(Workout::class);
     }
 
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class);
+    }
+
+    public function routines(): HasMany
+    {
+        return $this->hasMany(Routine::class);
+    }
+
     /**
      * The attributes that are mass assignable.
      *

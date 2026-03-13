@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\GoalController;
+use App\Http\Controllers\PrsController;
+use App\Http\Controllers\RoutineController;
+use App\Http\Controllers\StatsController;
 use App\Http\Controllers\WorkoutController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +38,25 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+    
+    // Stats
+    Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
+    
+    // PRs
+    Route::get('/prs', [PrsController::class, 'index'])->name('prs.index');
+    
+    // Goals
+    Route::get('/goals', [GoalController::class, 'index'])->name('goals.index');
+    Route::post('/goals', [GoalController::class, 'store']);
+    Route::delete('/goals/{goal}', [GoalController::class, 'destroy']);
+    Route::post('/goals/{goal}/complete', [GoalController::class, 'complete']);
+    
+    // Routines
+    Route::get('/routines', [RoutineController::class, 'index'])->name('routines.index');
+    Route::get('/routines/{routine}', [RoutineController::class, 'show'])->name('routines.show');
+    Route::post('/routines', [RoutineController::class, 'store']);
+    Route::delete('/routines/{routine}', [RoutineController::class, 'destroy']);
+    Route::post('/routines/{routine}/exercises', [RoutineController::class, 'addExercise']);
     
     // Workout routes
     Route::get('/workouts', [WorkoutController::class, 'index'])->name('workouts.index');

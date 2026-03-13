@@ -27,6 +27,11 @@ $recentWorkouts = auth()->user()->workouts()->completed()->with('sets.exercise')
     </div>
 </div>
 
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+    <a href="/goals" class="btn btn-secondary" style="text-decoration: none;">Goals</a>
+    <a href="/routines" class="btn btn-secondary" style="text-decoration: none;">Routines</a>
+</div>
+
 <div class="section">
     <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px;">Recent Workouts</div>
     

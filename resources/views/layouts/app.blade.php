@@ -176,7 +176,9 @@
         <nav>
             <a href="{{ route('dashboard') }}" class="nav-btn {{ request()->routeIs('dashboard') ? 'active' : '' }}">Home</a>
             <a href="{{ route('workouts.create') }}" class="nav-btn {{ request()->routeIs('workouts.create', 'workouts.edit') ? 'active' : '' }}">Log</a>
-            <a href="{{ route('workouts.index') }}" class="nav-btn {{ request()->routeIs('workouts.index') ? 'active' : '' }}">History</a>
+            <a href="{{ route('workouts.index') }}" class="nav-btn {{ request()->routeIs('workouts.index', 'workouts.show') ? 'active' : '' }}">History</a>
+            <a href="{{ route('stats.index') }}" class="nav-btn {{ request()->routeIs('stats.index') ? 'active' : '' }}">Stats</a>
+            <a href="{{ route('prs.index') }}" class="nav-btn {{ request()->routeIs('prs.index') ? 'active' : '' }}">PRs</a>
         </nav>
         @endauth
     </div>
