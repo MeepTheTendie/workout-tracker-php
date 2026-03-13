@@ -279,7 +279,6 @@ $recentRoutines = Auth::user()->routines()->with('exercises')->take(3)->get();
                     </svg>
                     Just Finished
                 </span>
-                <span class="continue-card-time">{{ round((time() - ($recentWorkout->ended_at / 1000)) / 60) }} min ago</span>
             </div>
             <div class="continue-card-workout">Workout #{{ $recentWorkout->id }}</div>
             <div class="continue-card-meta">

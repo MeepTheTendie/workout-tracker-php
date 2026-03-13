@@ -385,11 +385,6 @@ $grouped = $sets->groupBy('exercise_id');
 $timestamp = $workout->started_at / 1000;
 $dayName = date('l', $timestamp);
 $dateStr = date('F j, Y', $timestamp);
-
-$duration = 0;
-if ($workout->ended_at && $workout->started_at) {
-    $duration = round(($workout->ended_at - $workout->started_at) / 60000);
-}
 @endphp
 
 <!-- Navigation -->
@@ -421,15 +416,6 @@ if ($workout->ended_at && $workout->started_at) {
 <div class="workout-header-card">
     <div class="workout-date-display">{{ $dayName }}</div>
     <h1 class="workout-title-display">{{ $dateStr }}</h1>
-    @if($duration > 0)
-        <div class="workout-duration">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-            </svg>
-            {{ $duration }} minutes
-        </div>
-    @endif
     
     <!-- Stats -->
     <div class="stats-grid">

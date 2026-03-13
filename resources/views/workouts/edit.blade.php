@@ -359,7 +359,6 @@ $exercises = App\Models\Exercise::orderBy('name')->get();
         <span class="active-status-dot"></span>
         Active Workout
     </div>
-    <div class="active-timer" id="workoutTimer">00:00</div>
 </div>
 
 <!-- Add Exercise -->
@@ -464,17 +463,6 @@ $exercises = App\Models\Exercise::orderBy('name')->get();
 @section('scripts')
 <script>
 let workoutId = {{ $workout->id }};
-let startTime = {{ $workout->started_at / 1000 }};
-
-// Timer
-function updateTimer() {
-    const elapsed = Math.floor(Date.now() / 1000) - startTime;
-    const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
-    const secs = (elapsed % 60).toString().padStart(2, '0');
-    document.getElementById('workoutTimer').textContent = `${mins}:${secs}`;
-}
-setInterval(updateTimer, 1000);
-updateTimer();
 
 async function addExercise() {
     const exerciseId = document.getElementById('exerciseSelect').value;

@@ -408,13 +408,6 @@ $maxTrendVolume = max($volumeTrend) ?: 1;
             <div class="workout-card-meta">
                 <span class="workout-card-meta-item">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                    {{ $workout->duration ?? 0 }} min
-                </span>
-                <span class="workout-card-meta-item">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M6 5v14M18 5v14M3 8h18M3 16h18"/>
                     </svg>
                     {{ $workout->sets->count() }} sets

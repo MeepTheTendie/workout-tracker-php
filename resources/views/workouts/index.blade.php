@@ -411,13 +411,6 @@ $workouts = Auth::user()->workouts()
                     <div class="workout-meta-row">
                         <span class="workout-meta-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12 6 12 12 16 14"/>
-                            </svg>
-                            {{ $workout->duration ?? 0 }} min
-                        </span>
-                        <span class="workout-meta-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
                                 <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
                                 <path d="M4 22h16"/>
