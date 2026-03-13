@@ -15,125 +15,181 @@
     
     .login-branding {
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: 32px;
     }
     
+    /* Pixel Dumbbell Logo */
     .login-logo {
-        width: 80px;
-        height: 48px;
-        margin: 0 auto 20px;
+        width: 100px;
+        height: 60px;
+        margin: 0 auto 24px;
         image-rendering: pixelated;
     }
     
     .login-logo svg {
         width: 100%;
         height: 100%;
-        fill: var(--accent);
     }
     
     .login-title {
-        font-size: 28px;
+        font-size: 32px;
         font-weight: 700;
         letter-spacing: 4px;
         margin-bottom: 8px;
         color: var(--text);
     }
     
-    .login-subtitle {
-        font-size: 12px;
-        color: var(--text-dim);
-        letter-spacing: 2px;
-        text-transform: uppercase;
-    }
-    
+    /* White Card Form - matching mockup */
     .login-form-container {
         width: 100%;
-        max-width: 360px;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 12px;
+        max-width: 400px;
+        background: #fff;
+        border-radius: 4px;
         padding: 32px;
     }
     
-    .login-welcome {
-        text-align: center;
-        margin-bottom: 24px;
-        font-size: 13px;
-        color: var(--text-dim);
+    .login-form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 2px;
+        letter-spacing: 1px;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+    
+    .login-form-input {
+        width: 100%;
+        padding: 14px;
+        background: #fff;
+        border: 2px solid #e0e0e0;
+        border-radius: 4px;
+        font-family: 'Space Mono', monospace;
+        font-size: 15px;
+        color: #1a1a1a;
+        transition: all 0.2s;
+        margin-bottom: 20px;
+    }
+    
+    .login-form-input:focus {
+        outline: none;
+        border-color: var(--accent);
+    }
+    
+    .login-form-input::placeholder {
+        color: #999;
     }
     
     .btn-login {
+        width: 100%;
+        padding: 16px;
+        background: #1a1a1a;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        font-family: 'Space Mono', monospace;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.2s;
         margin-top: 8px;
     }
     
+    .btn-login:hover {
+        background: #333;
+    }
+    
     .login-footer {
-        margin-top: 24px;
+        margin-top: 20px;
         text-align: center;
-        font-size: 11px;
-        color: var(--text-muted);
+        font-size: 12px;
+        color: #666;
+    }
+    
+    .login-footer a {
+        color: var(--accent);
+        text-decoration: none;
+    }
+    
+    .login-footer a:hover {
+        text-decoration: underline;
+    }
+    
+    .login-footer .divider {
+        margin: 0 8px;
+        color: #ccc;
+    }
+    
+    .welcome-text {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 14px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 3px;
+    }
+    
+    .error-message {
+        color: #ff6b6b;
+        font-size: 12px;
+        margin-top: -12px;
+        margin-bottom: 16px;
     }
 </style>
 @endsection
 
 @section('content')
 <div class="login-container">
+    <!-- Pixel Dumbbell Logo -->
     <div class="login-branding">
-        <!-- Pixelated Barbell Logo -->
         <div class="login-logo">
-            <svg viewBox="0 0 80 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <!-- Bar -->
-                <rect x="12" y="22" width="56" height="4" fill="currentColor"/>
-                <!-- Left weights -->
-                <rect x="4" y="14" width="4" height="20" fill="currentColor"/>
-                <rect x="10" y="10" width="4" height="28" fill="currentColor"/>
-                <rect x="16" y="16" width="4" height="16" fill="currentColor"/>
+                <rect x="20" y="26" width="60" height="8" fill="#e0e0e0"/>
+                <!-- Left weights - pixelated style -->
+                <rect x="4" y="14" width="8" height="32" fill="#c0c0c0"/>
+                <rect x="14" y="8" width="6" height="44" fill="#d0d0d0"/>
+                <rect x="22" y="18" width="6" height="24" fill="#b0b0b0"/>
                 <!-- Right weights -->
-                <rect x="72" y="14" width="4" height="20" fill="currentColor"/>
-                <rect x="66" y="10" width="4" height="28" fill="currentColor"/>
-                <rect x="60" y="16" width="4" height="16" fill="currentColor"/>
-                <!-- Center grip detail -->
-                <rect x="36" y="20" width="8" height="8" fill="currentColor" opacity="0.5"/>
+                <rect x="88" y="14" width="8" height="32" fill="#c0c0c0"/>
+                <rect x="80" y="8" width="6" height="44" fill="#d0d0d0"/>
+                <rect x="72" y="18" width="6" height="24" fill="#b0b0b0"/>
+                <!-- Center grip -->
+                <rect x="42" y="24" width="16" height="12" fill="#a0a0a0"/>
             </svg>
         </div>
-        <h1 class="login-title">WORKOUT<br>TRACKER</h1>
-        <p class="login-subtitle">Track. Progress. Repeat.</p>
+        <h1 class="login-title">WORKOUT TRACKER</h1>
     </div>
     
+    <!-- White Card Form -->
     <div class="login-form-container">
-        <p class="login-welcome">Welcome Back</p>
-        
         <form method="POST" action="{{ route('login') }}">
             @csrf
             
-            <div class="form-group">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-input" value="{{ old('email') }}" required autofocus placeholder="your@email.com">
-            </div>
+            <label class="login-form-label">EMAIL</label>
+            <input type="email" name="email" class="login-form-input" value="{{ old('email') }}" required autofocus>
             
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <input type="password" name="password" class="form-input" required placeholder="••••••••">
-            </div>
-            
-            <button type="submit" class="btn btn-full btn-login">
-                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                    <polyline points="10,17 15,12 10,7"/>
-                    <line x1="15" y1="12" x2="3" y2="12"/>
-                </svg>
-                Sign In
-            </button>
+            <label class="login-form-label">PASSWORD</label>
+            <input type="password" name="password" class="login-form-input" required>
             
             @if ($errors->any())
-                <div class="error">
+                <div class="error-message">
                     {{ $errors->first() }}
                 </div>
             @endif
+            
+            <button type="submit" class="btn-login">LOGIN</button>
         </form>
+        
+        <div class="login-footer">
+            <a href="#">Forgot password?</a>
+            <span class="divider">|</span>
+            <a href="#">Sign up for a new account</a>
+        </div>
     </div>
     
-    <p class="login-footer">Built for lifters, by lifters.</p>
+    <p class="welcome-text">WELCOME</p>
 </div>
 @endsection

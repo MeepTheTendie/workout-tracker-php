@@ -4,138 +4,126 @@
 
 @section('styles')
 <style>
-    .page-header-routines {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid var(--border);
+    /* Page Header */
+    .page-header-center {
+        text-align: center;
+        margin-bottom: 24px;
+        padding-top: 20px;
     }
     
-    .page-header-routines-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
+    .header-logo {
+        width: 80px;
+        height: 48px;
+        margin: 0 auto 16px;
     }
     
-    .page-header-routines-left svg {
-        width: 32px;
-        height: 20px;
-        fill: var(--accent);
+    .header-logo svg {
+        width: 100%;
+        height: 100%;
     }
     
-    .page-title-group h1 {
-        font-size: 18px;
+    .page-title {
+        font-size: 24px;
         font-weight: 700;
-        letter-spacing: 1px;
-        margin-bottom: 2px;
+        letter-spacing: 2px;
+        color: var(--text);
     }
     
-    .page-title-group p {
-        font-size: 11px;
-        color: var(--text-dim);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    .new-routine-btn {
-        display: flex;
+    /* New Button */
+    .new-btn {
+        display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 10px 16px;
-        background: var(--accent);
+        padding: 10px 20px;
+        background: #333;
         border: none;
-        border-radius: 6px;
+        border-radius: 4px;
         color: #fff;
         font-family: 'Space Mono', monospace;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
         cursor: pointer;
-        transition: all 0.2s;
+        margin-bottom: 20px;
     }
     
-    .new-routine-btn:hover {
-        background: var(--accent-hover);
-    }
-    
-    .new-routine-btn svg {
+    .new-btn svg {
         width: 14px;
         height: 14px;
     }
     
-    /* Suggestion Templates */
-    .routine-suggestions {
+    /* White Card Container */
+    .routines-container {
+        background: #fff;
+        border-radius: 4px;
+        padding: 24px;
         margin-bottom: 20px;
     }
     
-    .suggestions-title {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: var(--text-dim);
-        margin-bottom: 12px;
+    .routines-empty-text {
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 20px;
+        line-height: 1.5;
     }
     
-    .suggestion-grid {
+    /* Template Grid */
+    .template-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr 1fr;
         gap: 12px;
     }
     
-    .suggestion-card {
-        background: rgba(255,255,255,0.03);
-        border: 1px dashed var(--border);
-        border-radius: 10px;
-        padding: 16px 12px;
-        text-align: center;
+    .template-card {
+        background: #f5f5f5;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 16px;
         cursor: pointer;
         transition: all 0.2s;
+        position: relative;
     }
     
-    .suggestion-card:hover {
-        background: rgba(255,107,53,0.1);
+    .template-card:hover {
         border-color: var(--accent);
-        border-style: solid;
         transform: translateY(-2px);
     }
     
-    .suggestion-card .icon {
-        width: 28px;
-        height: 28px;
-        margin: 0 auto 10px;
-        color: var(--accent);
+    .template-card-add {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 20px;
+        height: 20px;
+        color: #999;
     }
     
-    .suggestion-card .title {
-        font-size: 11px;
+    .template-card-title {
+        font-size: 13px;
         font-weight: 700;
-        text-transform: uppercase;
-        color: var(--text);
+        color: #1a1a1a;
         margin-bottom: 4px;
-    }
-    
-    .suggestion-card .desc {
-        font-size: 10px;
-        color: var(--text-dim);
+        padding-right: 20px;
         line-height: 1.4;
     }
     
     /* Routine Cards */
+    .section-title {
+        font-size: 12px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin: 24px 0 16px;
+    }
+    
     .routine-card {
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 10px;
+        border-radius: 8px;
         overflow: hidden;
         margin-bottom: 12px;
-        transition: all 0.2s;
-    }
-    
-    .routine-card:hover {
-        border-color: var(--accent);
     }
     
     .routine-card-header {
@@ -144,11 +132,6 @@
         justify-content: space-between;
         padding: 16px;
         cursor: pointer;
-        transition: background 0.2s;
-    }
-    
-    .routine-card-header:hover {
-        background: var(--surface-hover);
     }
     
     .routine-card-info {
@@ -177,24 +160,11 @@
         font-size: 14px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 2px;
     }
     
     .routine-meta {
         font-size: 11px;
         color: var(--text-dim);
-    }
-    
-    .routine-expand-icon {
-        width: 20px;
-        height: 20px;
-        color: var(--text-dim);
-        transition: transform 0.2s;
-    }
-    
-    .routine-card.expanded .routine-expand-icon {
-        transform: rotate(180deg);
     }
     
     .routine-card-body {
@@ -207,49 +177,25 @@
         display: block;
     }
     
-    .routine-description {
-        font-size: 12px;
-        color: var(--text-dim);
-        padding: 12px 0;
+    .routine-card.expanded .routine-expand-icon {
+        transform: rotate(180deg);
     }
     
     .routine-exercises {
-        margin-bottom: 12px;
+        margin: 12px 0;
     }
     
     .routine-exercise-item {
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 10px 0;
+        padding: 8px 0;
         border-bottom: 1px solid var(--border);
         font-size: 12px;
     }
     
     .routine-exercise-item:last-child {
         border-bottom: none;
-    }
-    
-    .routine-exercise-number {
-        width: 20px;
-        height: 20px;
-        background: var(--bg);
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-        color: var(--text-dim);
-    }
-    
-    .routine-exercise-name {
-        flex: 1;
-        font-weight: 600;
-    }
-    
-    .routine-exercise-targets {
-        font-size: 10px;
-        color: var(--text-dim);
     }
     
     .routine-actions {
@@ -259,11 +205,7 @@
     
     .routine-action-btn {
         flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        padding: 12px;
+        padding: 10px;
         background: var(--bg);
         border: 1px solid var(--border);
         border-radius: 6px;
@@ -274,13 +216,7 @@
         color: var(--text);
         cursor: pointer;
         text-decoration: none;
-        transition: all 0.2s;
-    }
-    
-    .routine-action-btn:hover {
-        background: var(--surface-hover);
-        border-color: var(--accent);
-        color: var(--accent);
+        text-align: center;
     }
     
     .routine-action-btn.primary {
@@ -289,46 +225,11 @@
         color: #fff;
     }
     
-    .routine-action-btn.primary:hover {
-        background: var(--accent-hover);
-    }
-    
-    .routine-action-btn svg {
-        width: 14px;
-        height: 14px;
-    }
-    
-    .routine-action-btn.delete:hover {
-        border-color: #ff6b6b;
-        color: #ff6b6b;
-    }
-    
     /* Empty State */
     .empty-state {
         text-align: center;
-        padding: 60px 20px;
+        padding: 40px 20px;
         color: var(--text-dim);
-    }
-    
-    .empty-state svg {
-        width: 56px;
-        height: 56px;
-        margin: 0 auto 20px;
-        opacity: 0.3;
-    }
-    
-    .empty-state h3 {
-        font-size: 14px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 8px;
-        color: var(--text);
-    }
-    
-    .empty-state p {
-        font-size: 12px;
-        margin-bottom: 20px;
     }
     
     /* Modal */
@@ -353,7 +254,7 @@
     .modal-content {
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 12px;
+        border-radius: 8px;
         padding: 24px;
         width: 100%;
         max-width: 400px;
@@ -379,72 +280,6 @@
         border-radius: 6px;
         color: var(--text);
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    /* Muscle Group Panels */
-    .muscle-panels {
-        margin-bottom: 20px;
-    }
-    
-    .muscle-panel {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        margin-bottom: 8px;
-        overflow: hidden;
-    }
-    
-    .muscle-panel-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 16px;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-    
-    .muscle-panel-header:hover {
-        background: var(--surface-hover);
-    }
-    
-    .muscle-panel-title {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 13px;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-    
-    .muscle-panel-title svg {
-        width: 18px;
-        height: 18px;
-        color: var(--accent);
-    }
-    
-    .muscle-panel-count {
-        font-size: 11px;
-        color: var(--text-dim);
-        background: var(--bg);
-        padding: 2px 8px;
-        border-radius: 10px;
-    }
-    
-    .muscle-panel-body {
-        display: none;
-        padding: 0 16px 16px;
-        border-top: 1px solid var(--border);
-    }
-    
-    .muscle-panel.expanded .muscle-panel-body {
-        display: block;
-    }
-    
-    .muscle-panel.expanded .routine-expand-icon {
-        transform: rotate(180deg);
     }
 </style>
 @endsection
@@ -453,121 +288,120 @@
 @php
 $routines = auth()->user()->routines()->with('exercises.exercise')->get();
 $exercises = App\Models\Exercise::orderBy('name')->get();
-
-// Group routines by muscle focus
-$chestRoutines = [];
-$backRoutines = [];
-$legRoutines = [];
-$pushRoutines = [];
-$pullRoutines = [];
-$fullBodyRoutines = [];
-
-foreach ($routines as $routine) {
-    $name = strtolower($routine->name);
-    if (str_contains($name, 'chest') || str_contains($name, 'push')) {
-        $pushRoutines[] = $routine;
-    } elseif (str_contains($name, 'back') || str_contains($name, 'pull')) {
-        $pullRoutines[] = $routine;
-    } elseif (str_contains($name, 'leg') || str_contains($name, 'squat')) {
-        $legRoutines[] = $routine;
-    } elseif (str_contains($name, 'full') || str_contains($name, 'total')) {
-        $fullBodyRoutines[] = $routine;
-    } else {
-        $fullBodyRoutines[] = $routine;
-    }
-}
 @endphp
 
-<!-- Header with Branding -->
-<div class="page-header-routines">
-    <div class="page-header-routines-left">
-        <svg viewBox="0 0 80 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="12" y="22" width="56" height="4"/>
-            <rect x="4" y="14" width="4" height="20"/>
-            <rect x="10" y="10" width="4" height="28"/>
-            <rect x="16" y="16" width="4" height="16"/>
-            <rect x="72" y="14" width="4" height="20"/>
-            <rect x="66" y="10" width="4" height="28"/>
-            <rect x="60" y="16" width="4" height="16"/>
+<!-- Header -->
+<div class="page-header-center">
+    <div class="header-logo">
+        <svg viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="26" width="60" height="8" fill="#e0e0e0"/>
+            <rect x="4" y="14" width="8" height="32" fill="#c0c0c0"/>
+            <rect x="14" y="8" width="6" height="44" fill="#d0d0d0"/>
+            <rect x="22" y="18" width="6" height="24" fill="#b0b0b0"/>
+            <rect x="88" y="14" width="8" height="32" fill="#c0c0c0"/>
+            <rect x="80" y="8" width="6" height="44" fill="#d0d0d0"/>
+            <rect x="72" y="18" width="6" height="24" fill="#b0b0b0"/>
+            <rect x="42" y="24" width="16" height="12" fill="#a0a0a0"/>
         </svg>
-        <div class="page-title-group">
-            <h1>MY ROUTINES</h1>
-            <p>Build once. Use forever.</p>
-        </div>
     </div>
-    <button class="new-routine-btn" onclick="showAddRoutineModal()">
+    <h1 class="page-title">MY ROUTINES</h1>
+</div>
+
+<div style="text-align: center;">
+    <button class="new-btn" onclick="showAddRoutineModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="5" x2="12" y2="19"/>
             <line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
-        New
+        NEW
     </button>
 </div>
 
-@if($routines->isEmpty())
-    <!-- Suggestion Templates for Empty State -->
-    <div class="routine-suggestions">
-        <p class="suggestions-title">Quick Start Templates</p>
-        <div class="suggestion-grid">
-            <div class="suggestion-card" onclick="createTemplateRoutine('Push Day', 'Chest, Shoulders, Triceps', ['Bench Press', 'Shoulder Press - Machine', 'Tricep Pushdown'])">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-                    <path d="M4 22h16"/>
-                    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-                    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-                    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+<!-- Routines Container -->
+<div class="routines-container">
+    @if($routines->isEmpty())
+        <p class="routines-empty-text">No routines yet. Select a template to start, or create a custom one.</p>
+        
+        <div class="template-grid">
+            <div class="template-card" onclick="createTemplateRoutine('Full Body: 3-Day Split (Strength)', 'Compound movements for full body strength', ['Squat', 'Bench Press', 'Barbell Row', 'Overhead Press'])">
+                <svg class="template-card-add" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
-                <div class="title">Push Day</div>
-                <div class="desc">Chest, shoulders<br>triceps</div>
+                <div class="template-card-title">Full Body: 3-Day Split (Strength)</div>
             </div>
-            <div class="suggestion-card" onclick="createTemplateRoutine('Pull Day', 'Back, Biceps, Rear Delts', ['Lat Pulldown', 'Barbell Row', 'Bicep Curl'])">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            <div class="template-card" onclick="createTemplateRoutine('Lower Body Focus (Leg Day)', 'Quads, hamstrings, and calves', ['Squat', 'Leg Press', 'Leg Curl', 'Calf Raise'])">
+                <svg class="template-card-add" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
-                <div class="title">Pull Day</div>
-                <div class="desc">Back, biceps<br>rear delts</div>
+                <div class="template-card-title">Lower Body Focus (Leg Day)</div>
             </div>
-            <div class="suggestion-card" onclick="createTemplateRoutine('Leg Day', 'Quads, Hamstrings, Calves', ['Squat', 'Leg Press', 'Leg Curl', 'Calf Raise'])">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 3v18M8 21l4-4 4 4M8 3l4 4 4-4"/>
+            <div class="template-card" onclick="createTemplateRoutine('Cardio & Conditioning (HIIT)', 'High intensity interval training', ['Treadmill Run', 'Burpees', 'Mountain Climbers', 'Jump Rope'])">
+                <svg class="template-card-add" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
-                <div class="title">Leg Day</div>
-                <div class="desc">Quads, hams<br>calves</div>
+                <div class="template-card-title">Cardio & Conditioning (HIIT)</div>
             </div>
-            <div class="suggestion-card" onclick="createTemplateRoutine('Full Body', 'Compound movements everywhere', ['Squat', 'Bench Press', 'Barbell Row', 'Overhead Press'])">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <circle cx="12" cy="12" r="3"/>
+            <div class="template-card" onclick="createTemplateRoutine('Upper Body Power (Push/Pull)', 'Chest, back, shoulders, and arms', ['Bench Press', 'Lat Pulldown', 'Shoulder Press', 'Bicep Curl'])">
+                <svg class="template-card-add" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
-                <div class="title">Full Body</div>
-                <div class="desc">3-day split<br>compound focus</div>
+                <div class="template-card-title">Upper Body Power (Push/Pull)</div>
             </div>
         </div>
-    </div>
-    
-    <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-        </svg>
-        <h3>No Routines Yet</h3>
-        <p>Create your first routine or use a template above.</p>
-        <button class="btn" onclick="showAddRoutineModal()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Create Routine
-        </button>
-    </div>
-@else
-    <!-- Routines List -->
+    @else
+        <!-- Show routines inside container -->
+        @foreach($routines as $routine)
+            <div class="routine-card" id="routine-{{ $routine->id }}" style="background: #f5f5f5; border: 1px solid #e0e0e0;">
+                <div class="routine-card-header" onclick="toggleRoutine({{ $routine->id }})">
+                    <div class="routine-card-info">
+                        <div class="routine-icon" style="background: #fff;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="routine-name" style="color: #1a1a1a;">{{ $routine->name }}</div>
+                            <div class="routine-meta">{{ $routine->exercises->count() }} exercises</div>
+                        </div>
+                    </div>
+                    <svg class="routine-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; color: #666;">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="routine-card-body">
+                    @if($routine->exercises->isNotEmpty())
+                        <div class="routine-exercises">
+                            @foreach($routine->exercises as $idx => $ex)
+                                <div class="routine-exercise-item" style="border-color: #e0e0e0; color: #1a1a1a;">
+                                    <span>{{ $idx + 1 }}. {{ $ex->exercise->name }}</span>
+                                    <span style="color: #666;">{{ $ex->target_sets ?? 3 }}×{{ $ex->target_reps ?? 8 }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                    <div class="routine-actions">
+                        <a href="/routines/{{ $routine->id }}" class="routine-action-btn" style="background: #fff; color: #1a1a1a;">Edit</a>
+                        <button class="routine-action-btn primary" onclick="startRoutine({{ $routine->id }})">Start</button>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    @endif
+</div>
+
+<!-- User's Routines Section (if they have some outside the container) -->
+@if($routines->isNotEmpty())
+    <p class="section-title">MY ROUTINES</p>
     @foreach($routines as $routine)
-        <div class="routine-card" id="routine-{{ $routine->id }}">
-            <div class="routine-card-header" onclick="toggleRoutine({{ $routine->id }})">
+        <div class="routine-card" id="routine-list-{{ $routine->id }}">
+            <div class="routine-card-header" onclick="toggleRoutineList({{ $routine->id }})">
                 <div class="routine-card-info">
                     <div class="routine-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -582,52 +416,25 @@ foreach ($routines as $routine) {
                         <div class="routine-meta">{{ $routine->exercises->count() }} exercises</div>
                     </div>
                 </div>
-                <svg class="routine-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg class="routine-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
                     <polyline points="6 9 12 15 18 9"/>
                 </svg>
             </div>
             <div class="routine-card-body">
-                @if($routine->description)
-                    <p class="routine-description">{{ $routine->description }}</p>
-                @endif
-                
                 @if($routine->exercises->isNotEmpty())
                     <div class="routine-exercises">
                         @foreach($routine->exercises as $idx => $ex)
                             <div class="routine-exercise-item">
-                                <span class="routine-exercise-number">{{ $idx + 1 }}</span>
-                                <span class="routine-exercise-name">{{ $ex->exercise->name }}</span>
-                                <span class="routine-exercise-targets">
-                                    {{ $ex->target_sets ?? 3 }}×{{ $ex->target_reps ?? 8 }}
-                                    @if($ex->target_weight)
-                                        @ {{ $ex->target_weight }} lbs
-                                    @endif
-                                </span>
+                                <span>{{ $idx + 1 }}. {{ $ex->exercise->name }}</span>
+                                <span style="color: var(--text-dim);">{{ $ex->target_sets ?? 3 }}×{{ $ex->target_reps ?? 8 }}</span>
                             </div>
                         @endforeach
                     </div>
                 @endif
-                
                 <div class="routine-actions">
-                    <a href="/routines/{{ $routine->id }}" class="routine-action-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                        </svg>
-                        Edit
-                    </a>
-                    <button class="routine-action-btn primary" onclick="startRoutine({{ $routine->id }})">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="5 3 19 12 5 21 5 3"/>
-                        </svg>
-                        Start
-                    </button>
-                    <button class="routine-action-btn delete" onclick="deleteRoutine({{ $routine->id }})">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"/>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                        </svg>
-                    </button>
+                    <a href="/routines/{{ $routine->id }}" class="routine-action-btn">Edit</a>
+                    <button class="routine-action-btn primary" onclick="startRoutine({{ $routine->id }})">Start</button>
+                    <button class="routine-action-btn" onclick="deleteRoutine({{ $routine->id }})" style="flex: 0.5;">🗑</button>
                 </div>
             </div>
         </div>
@@ -670,6 +477,11 @@ function toggleRoutine(id) {
     card.classList.toggle('expanded');
 }
 
+function toggleRoutineList(id) {
+    const card = document.getElementById('routine-list-' + id);
+    card.classList.toggle('expanded');
+}
+
 function showAddRoutineModal() {
     document.getElementById('addRoutineModal').classList.add('active');
 }
@@ -679,7 +491,6 @@ function hideAddRoutineModal() {
 }
 
 async function createTemplateRoutine(name, description, exercises) {
-    // Create the routine first
     const res = await fetch('/routines', {
         method: 'POST',
         headers: {
@@ -691,9 +502,7 @@ async function createTemplateRoutine(name, description, exercises) {
     
     const data = await res.json();
     if (data.id) {
-        // Add exercises to the routine
         for (const exerciseName of exercises) {
-            // Find exercise ID by name
             const exerciseOptions = document.querySelectorAll('option');
             let exerciseId = null;
             for (const opt of exerciseOptions) {
