@@ -390,7 +390,7 @@ $workouts = Auth::user()->workouts()
                 $dayName = date('D', $timestamp);
                 $dayNum = date('j', $timestamp);
             @endphp
-            <a href="/workouts/{{ $workout->id }}" class="workout-card" data-workout="{{ strtolower($workout->id . ' ' . implode(' ', $exerciseNames->toArray())) }}">
+            <a href="/workouts/{{ $workout->id }}" class="workout-card" data-workout="{{ strtolower($workout->id . ' ' . implode(' ', $exerciseNames->toArray())) }}" data-timestamp="{{ $workout->started_at }}">
                 <div class="workout-card-header">
                     <div class="workout-date-group">
                         <div class="workout-day-badge">
@@ -449,13 +449,44 @@ $workouts = Auth::user()->workouts()
 
 @section('scripts')
 <script>
-// Filter buttons
 const filterBtns = document.querySelectorAll('.filter-btn');
+const workoutCards = document.querySelectorAll('.workout-card');
+
+function filterWorkoutsByTime(filter) {
+    const now = Date.now();
+    let minTime = 0;
+    
+    if (filter === 'week') {
+        minTime = now - (7 * 24 * 60 * 60 * 1000);
+    } else if (filter === 'month') {
+        minTime = now - (30 * 24 * 60 * 60 * 1000);
+    } else if (filter === 'year') {
+        minTime = now - (365 * 24 * 60 * 60 * 1000);
+    }
+    
+    workoutCards.forEach(card => {
+        const workoutTime = parseInt(card.getAttribute('data-timestamp'));
+        if (filter === 'all' || workoutTime >= minTime) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Apply initial filter based on active button
+document.addEventListener('DOMContentLoaded', () => {
+    const activeBtn = document.querySelector('.filter-btn.active');
+    if (activeBtn) {
+        filterWorkoutsByTime(activeBtn.getAttribute('data-filter'));
+    }
+});
+
 filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         filterBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        // Filter logic would go here
+        filterWorkoutsByTime(btn.getAttribute('data-filter'));
     });
 });
 
