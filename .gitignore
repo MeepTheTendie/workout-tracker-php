@@ -7,3 +7,5 @@ composer.lock
 .env
 .env.local
 data/workout.db
+storage/
+.well-known/
