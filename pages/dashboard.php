@@ -7,23 +7,48 @@ $stmt = $db->prepare("SELECT COUNT(*) as total_workouts FROM workouts WHERE user
 $stmt->execute([$_SESSION['user_id']]);
 $totalWorkouts = $stmt->fetch()['total_workouts'];
 
-$stmt = $db->prepare("SELECT SUM(weight * reps) as total_volume FROM workout_sets ws JOIN workouts w ON ws.workout_id = w.id WHERE w.user_id = ? AND w.ended_at IS NOT NULL");
+$stmt = $db->prepare("
+    SELECT SUM(weight * reps) as total_volume 
+    FROM workout_sets ws 
+    JOIN workouts w ON ws.workout_id = w.id 
+    WHERE w.user_id = ? AND w.ended_at IS NOT NULL
+");
 $stmt->execute([$_SESSION['user_id']]);
 $totalVolume = $stmt->fetch()['total_volume'] ?? 0;
 
-// Get recent workouts
-$stmt = $db->prepare("SELECT w.*, COUNT(ws.id) as set_count FROM workouts w LEFT JOIN workout_sets ws ON w.id = ws.workout_id WHERE w.user_id = ? AND w.ended_at IS NOT NULL GROUP BY w.id ORDER BY w.started_at DESC LIMIT 5");
+// Get recent workouts WITH volume per workout
+$stmt = $db->prepare("
+    SELECT w.*, COUNT(ws.id) as set_count, COALESCE(SUM(ws.weight * ws.reps), 0) as total_volume 
+    FROM workouts w 
+    LEFT JOIN workout_sets ws ON w.id = ws.workout_id
+    WHERE w.user_id = ? AND w.ended_at IS NOT NULL 
+    GROUP BY w.id 
+    ORDER BY w.started_at DESC 
+    LIMIT 5
+");
 $stmt->execute([$_SESSION['user_id']]);
 $recentWorkouts = $stmt->fetchAll();
 
-// Helper to get exercises for a workout
+// 20K goal
+$GOAL_VOLUME = 20000;
+
+/**
+ * Get exercises for a workout
+ */
 function getWorkoutExercises($db, $workoutId) {
-    $stmt = $db->prepare("SELECT DISTINCT e.name FROM workout_sets ws JOIN exercises e ON ws.exercise_id = e.id WHERE ws.workout_id = ?");
+    $stmt = $db->prepare("
+        SELECT DISTINCT e.name 
+        FROM workout_sets ws 
+        JOIN exercises e ON ws.exercise_id = e.id 
+        WHERE ws.workout_id = ?
+    ");
     $stmt->execute([$workoutId]);
     return $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-// Helper to get muscle groups
+/**
+ * Get muscle groups from exercise names
+ */
 function getMuscleGroups($exercises) {
     $groups = [];
     foreach ($exercises as $name) {
@@ -32,11 +57,11 @@ function getMuscleGroups($exercises) {
             $groups[] = 'chest';
         } elseif (str_contains($nameLower, 'row') || str_contains($nameLower, 'pull') || str_contains($nameLower, 'lat') || str_contains($nameLower, 'back') || str_contains($nameLower, 'extension')) {
             $groups[] = 'back';
-        } elseif (str_contains($nameLower, 'squat') || str_contains($nameLower, 'leg') || str_contains($nameLower, 'calf') || str_contains($nameLower, 'hip')) {
+        } elseif (str_contains($nameLower, 'squat') || str_contains($nameLower, 'leg') || str_contains($nameLower, 'calf')) {
             $groups[] = 'leg';
         } elseif (str_contains($nameLower, 'shoulder') || str_contains($nameLower, 'raise') || str_contains($nameLower, 'shrug')) {
             $groups[] = 'shoulders';
-        } elseif (str_contains($nameLower, 'curl') || str_contains($nameLower, 'bicep') || str_contains($nameLower, 'tricep') || str_contains($nameLower, 'extension')) {
+        } elseif (str_contains($nameLower, 'curl') || str_contains($nameLower, 'bicep') || str_contains($nameLower, 'tricep') || str_contains($nameLower, 'dip')) {
             $groups[] = 'arms';
         }
     }
@@ -52,6 +77,111 @@ function getMuscleGroups($exercises) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .workout-item { 
+            display: block; 
+            background: var(--surface); 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            padding: 16px; 
+            margin-bottom: 12px; 
+            text-decoration: none;
+            color: inherit;
+        }
+        .workout-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .workout-item-title { 
+            font-size: 14px; 
+            font-weight: 700; 
+            color: var(--text);
+            text-transform: uppercase;
+        }
+        .workout-item-date { 
+            font-size: 11px; 
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+        .volume-badge {
+            background: var(--accent);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .volume-badge.goal-met {
+            background: var(--success, #4ade80);
+        }
+        .volume-bar-bg {
+            height: 4px;
+            background: var(--bg);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .volume-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        .volume-bar-fill.goal-met {
+            background: var(--success, #4ade80);
+        }
+        .muscle-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .muscle-tag {
+            font-size: 9px;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+        .muscle-tag.chest { background: rgba(255, 107, 53, 0.2); color: var(--accent); }
+        .muscle-tag.back { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
+        .muscle-tag.leg { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .muscle-tag.shoulders { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+        .muscle-tag.arms { background: rgba(234, 179, 8, 0.2); color: #eab308; }
+        .goal-progress {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 16px 0;
+        }
+        .goal-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .goal-bar-bg {
+            height: 8px;
+            background: var(--bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .goal-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--success, #4ade80));
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        .goal-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            margin-top: 8px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <div class="app">
@@ -81,6 +211,27 @@ function getMuscleGroups($exercises) {
                 <div class="stat-box">
                     <div class="stat-box-label">TOTAL VOLUME</div>
                     <div class="stat-box-value small"><?php echo number_format($totalVolume / 1000, 1); ?>k</div>
+                </div>
+            </div>
+            
+            <?php 
+            // Calculate goal progress
+            $latestVolume = !empty($recentWorkouts) ? $recentWorkouts[0]['total_volume'] : 0;
+            $goalPercent = min(($latestVolume / $GOAL_VOLUME) * 100, 100);
+            $goalMet = $latestVolume >= $GOAL_VOLUME;
+            ?>
+            <div class="goal-progress">
+                <div class="goal-label">Latest Workout vs 20K Goal</div>
+                <div class="goal-bar-bg">
+                    <div class="goal-bar-fill" style="width: <?php echo $goalPercent; ?>%"></div>
+                </div>
+                <div class="goal-text">
+                    <?php echo number_format($latestVolume); ?> / 20,000 lbs 
+                    <?php if ($goalMet): ?>
+                        <span style="color: var(--success, #4ade80);">✓ GOAL MET!</span>
+                    <?php else: ?>
+                        (<?php echo number_format($GOAL_VOLUME - $latestVolume); ?> to go)
+                    <?php endif; ?>
                 </div>
             </div>
             
@@ -121,21 +272,21 @@ function getMuscleGroups($exercises) {
                         $exercises = getWorkoutExercises($db, $workout['id']);
                         $muscleGroups = getMuscleGroups($exercises);
                         $timestamp = $workout['started_at'] / 1000;
+                        $workoutGoalMet = $workout['total_volume'] >= $GOAL_VOLUME;
+                        $volumePercent = min(($workout['total_volume'] / $GOAL_VOLUME) * 100, 100);
                     ?>
                         <a href="/workouts/view?id=<?php echo $workout['id']; ?>" class="workout-item">
                             <div class="workout-item-header">
                                 <div>
                                     <div class="workout-item-title">Workout #<?php echo $workout['id']; ?> — <?php echo date('l', $timestamp); ?></div>
-                                    <div class="workout-item-date"><?php echo date('M j, Y', $timestamp); ?></div>
+                                    <div class="workout-item-date"><?php echo date('M j, Y', $timestamp); ?> • <?php echo $workout['set_count']; ?> sets</div>
+                                </div>
+                                <div class="volume-badge <?php echo $workoutGoalMet ? 'goal-met' : ''; ?>">
+                                    <?php echo number_format($workout['total_volume']); ?> lbs
                                 </div>
                             </div>
-                            <div class="workout-item-stats">
-                                <span class="workout-item-stat">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M6 5v14M18 5v14M3 8h18M3 16h18"/>
-                                    </svg>
-                                    <?php echo $workout['set_count']; ?> sets
-                                </span>
+                            <div class="volume-bar-bg">
+                                <div class="volume-bar-fill <?php echo $workoutGoalMet ? 'goal-met' : ''; ?>" style="width: <?php echo $volumePercent; ?>%"></div>
                             </div>
                             <?php if (!empty($muscleGroups)): ?>
                                 <div class="muscle-tags">

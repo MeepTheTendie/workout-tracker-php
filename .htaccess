@@ -1,4 +1,65 @@
+# Workout Tracker - Security Hardened .htaccess
+
+# Disable server signature
+ServerSignature Off
+
+# Disable directory browsing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "\.(sql|log|ini|json|lock|env)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protect sensitive directories
 RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?page=$1 [QSA,L]
+RewriteRule ^includes/ - [F,L]
+RewriteRule ^storage/ - [F,L]
+
+# Security headers (fallback if PHP headers fail)
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "DENY"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=()"
+    
+    # CSP Header with fonts from Google
+    Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'self';"
+    
+    # Remove server headers
+    Header unset X-Powered-By
+    Header always unset X-Powered-By
+</IfModule>
+
+# Enable rewrite for pretty URLs
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# PHP settings
+<IfModule mod_php.c>
+    php_flag display_errors off
+    php_value upload_max_filesize 1M
+    php_value post_max_size 1M
+    php_value max_execution_time 30
+    php_value max_input_time 30
+    php_value memory_limit 64M
+    php_flag expose_php off
+</IfModule>
+
+# Disable caching for CSS during development
+<FilesMatch "\.css$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+</FilesMatch>

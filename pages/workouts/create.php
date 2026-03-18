@@ -1,6 +1,7 @@
 <?php
 requireAuth();
 $db = getDB();
+require_once __DIR__ . '/../../includes/progression.php';
 
 // Get all exercises for dropdown
 $stmt = $db->query("SELECT * FROM exercises ORDER BY category, name");
@@ -12,31 +13,15 @@ foreach ($exercises as $ex) {
     $byCategory[$ex['category']][] = $ex;
 }
 
-// Progression rules
-$progressionRules = [
-    'Back Extension' => ['increment' => 15, 'unit' => 'lbs'],
-    'Low Back - Roc It' => ['increment' => 15, 'unit' => 'lbs', 'note' => 'Till 45, then 20'],
-    'Diverging Seated Row' => ['increment' => 10, 'unit' => 'lbs'],
-    'Leg Press' => ['increment' => 15, 'unit' => 'lbs'],
-    'Converging Chest Press' => ['increment' => 15, 'unit' => 'lbs'],
-    'Tricep Extensions' => ['increment' => 10, 'unit' => 'lbs'],
-    'Bicep Curl' => ['increment' => 15, 'unit' => 'lbs'],
-    'Shoulder Press - Machine' => ['increment' => 20, 'unit' => 'lbs'],
-];
-
 // Get last used weight for each exercise
-$lastWeights = [];
-$stmt = $db->prepare("SELECT e.name, ws.weight FROM workout_sets ws JOIN exercises e ON ws.exercise_id = e.id JOIN workouts w ON ws.workout_id = w.id WHERE w.user_id = ? AND w.ended_at IS NOT NULL ORDER BY ws.id DESC");
-$stmt->execute([$_SESSION['user_id']]);
-$allSets = $stmt->fetchAll();
-foreach ($allSets as $set) {
-    if (!isset($lastWeights[$set['name']])) {
-        $lastWeights[$set['name']] = $set['weight'];
-    }
-}
+$lastWeights = getLastWeights($db, $_SESSION['user_id']);
 
 // Check for active workout
-$stmt = $db->prepare("SELECT * FROM workouts WHERE user_id = ? AND ended_at IS NULL ORDER BY started_at DESC LIMIT 1");
+$stmt = $db->prepare("
+    SELECT * FROM workouts 
+    WHERE user_id = ? AND ended_at IS NULL 
+    ORDER BY started_at DESC LIMIT 1
+");
 $stmt->execute([$_SESSION['user_id']]);
 $activeWorkout = $stmt->fetch();
 
@@ -45,7 +30,13 @@ $workoutId = $activeWorkout ? $activeWorkout['id'] : null;
 // Get sets for active workout
 $workoutSets = [];
 if ($workoutId) {
-    $stmt = $db->prepare("SELECT ws.*, e.name as exercise_name FROM workout_sets ws JOIN exercises e ON ws.exercise_id = e.id WHERE ws.workout_id = ? ORDER BY ws.id");
+    $stmt = $db->prepare("
+        SELECT ws.*, e.name as exercise_name 
+        FROM workout_sets ws 
+        JOIN exercises e ON ws.exercise_id = e.id 
+        WHERE ws.workout_id = ? 
+        ORDER BY ws.id
+    ");
     $stmt->execute([$workoutId]);
     $workoutSets = $stmt->fetchAll();
 }
@@ -55,10 +46,28 @@ $currentExercises = [];
 foreach ($workoutSets as $set) {
     $exName = $set['exercise_name'];
     if (!isset($currentExercises[$exName])) {
-        $currentExercises[$exName] = ['sets' => [], 'totalVolume' => 0];
+        $currentExercises[$exName] = [
+            'sets' => [], 
+            'totalVolume' => 0, 
+            'exercise_id' => $set['exercise_id']
+        ];
     }
     $currentExercises[$exName]['sets'][] = $set;
-    $currentExercises[$exName]['totalVolume'] += ($set['weight'] * $set['reps']);
+    if ($set['completed_at']) {
+        $currentExercises[$exName]['totalVolume'] += ($set['weight'] * $set['reps']);
+    }
+}
+
+// Build progression rules array for JS (only exercise names that have rules)
+$jsProgressionRules = [];
+foreach ($GLOBALS['PROGRESSION_RULES'] as $name => $rule) {
+    $jsProgressionRules[$name] = [
+        'increment' => $rule['increment'],
+        'unit' => $rule['unit']
+    ];
+    if ($rule['special'] === 'roc_it') {
+        $jsProgressionRules[$name]['note'] = 'Till 45, then 20';
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -83,10 +92,16 @@ foreach ($workoutSets as $set) {
         .btn-finish { background: var(--success); }
         .current-sets { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
         .current-sets h3 { font-size: 12px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 12px; }
-        .exercise-block { background: #fff; border-radius: 4px; padding: 12px; margin-bottom: 12px; }
-        .exercise-block h4 { font-size: 13px; color: #1a1a1a; text-transform: uppercase; margin-bottom: 8px; }
-        .set-line { display: flex; justify-content: space-between; font-size: 12px; color: #666; padding: 4px 0; border-bottom: 1px solid #eee; }
+        .exercise-block { background: var(--bg); border-radius: 8px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); }
+        .exercise-block h4 { font-size: 13px; text-transform: uppercase; margin-bottom: 8px; color: var(--text); }
+        .set-line { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
         .set-line:last-child { border-bottom: none; }
+        .set-pending { color: var(--accent); font-weight: 700; }
+        .set-done { color: var(--success, #4ade80); }
+        .set-target { color: var(--text-dim); font-size: 11px; }
+        .btn-log-set { background: var(--accent); color: #fff; border: none; padding: 4px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'Space Mono', monospace; }
+        .btn-log-set:hover { filter: brightness(1.1); }
+        .volume-line { margin-top: 8px; padding-top: 8px; border-top: 2px solid var(--border); font-weight: 700; font-size: 12px; color: var(--text-dim); }
     </style>
 </head>
 <body>
@@ -96,6 +111,7 @@ foreach ($workoutSets as $set) {
             
             <?php if (!$activeWorkout): ?>
                 <form method="POST" action="/api/workout/start" style="margin-bottom: 24px;">
+                    <?php echo Security::csrfField(); ?>
                     <button type="submit" class="btn">START NEW WORKOUT</button>
                 </form>
             <?php else: ?>
@@ -109,10 +125,20 @@ foreach ($workoutSets as $set) {
                                 <h4><?php echo h($exName); ?></h4>
                                 <?php foreach ($data['sets'] as $i => $set): ?>
                                     <div class="set-line">
-                                        <span>Set <?php echo $i + 1; ?>: <?php echo $set['reps']; ?> reps @ <?php echo $set['weight']; ?> lbs</span>
+                                        <span>
+                                            Set <?php echo $i + 1; ?>: 
+                                            <?php if ($set['completed_at']): ?>
+                                                <span class="set-done"><?php echo $set['reps']; ?> reps @ <?php echo $set['weight']; ?> lbs</span>
+                                            <?php else: ?>
+                                                <span class="set-target">Target: <?php echo $set['reps'] ?? '?'; ?> reps @ <?php echo $set['weight'] ?? '?'; ?> lbs</span>
+                                            <?php endif; ?>
+                                        </span>
+                                        <?php if (!$set['completed_at']): ?>
+                                            <button class="btn-log-set" onclick="logSet(<?php echo $set['id']; ?>, <?php echo $set['weight'] ?? 0; ?>, <?php echo $set['reps'] ?? 0; ?>, <?php echo json_encode($exName); ?>)">LOG</button>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endforeach; ?>
-                                <div class="set-line" style="margin-top: 8px; padding-top: 8px; border-top: 2px solid #eee; font-weight: 700;">
+                                <div class="volume-line">
                                     <span>Volume: <?php echo number_format($data['totalVolume']); ?> lbs</span>
                                 </div>
                             </div>
@@ -121,6 +147,7 @@ foreach ($workoutSets as $set) {
                 <?php endif; ?>
                 
                 <form method="POST" action="/api/workout/set" style="margin-bottom: 16px;">
+                    <?php echo Security::csrfField(); ?>
                     <div class="exercise-select">
                         <label>Select Exercise</label>
                         <select name="exercise_id" id="exerciseSelect" required onchange="showProgression()">
@@ -136,7 +163,6 @@ foreach ($workoutSets as $set) {
                     </div>
                     
                     <div id="progressionHint" class="progression-hint" style="display: none;">
-                        <!-- Filled by JS -->
                     </div>
                     
                     <div class="set-row">
@@ -148,6 +174,7 @@ foreach ($workoutSets as $set) {
                 </form>
                 
                 <form method="POST" action="/api/workout/finish">
+                    <?php echo Security::csrfField(); ?>
                     <button type="submit" class="btn btn-finish" style="width: 100%;">FINISH WORKOUT</button>
                 </form>
             <?php endif; ?>
@@ -163,7 +190,7 @@ foreach ($workoutSets as $set) {
     </div>
     
     <script>
-        const progressionRules = <?php echo json_encode($progressionRules); ?>;
+        const progressionRules = <?php echo json_encode($jsProgressionRules); ?>;
         const lastWeights = <?php echo json_encode($lastWeights); ?>;
         
         function showProgression() {
@@ -180,22 +207,19 @@ foreach ($workoutSets as $set) {
             
             let html = '';
             
-            // Show last weight
             if (lastWeights[name]) {
-                html += `<div>Last time: <strong>${lastWeights[name]} lbs</strong></div>`;
+                html += '<div>Last time: <strong>' + lastWeights[name] + ' lbs</strong></div>';
             }
             
-            // Show progression rule
             if (progressionRules[name]) {
                 const rule = progressionRules[name];
                 const nextWeight = lastWeights[name] ? parseFloat(lastWeights[name]) + rule.increment : rule.increment;
-                html += `<div style="margin-top: 8px;">Next: Try <strong>${nextWeight} lbs</strong> (+${rule.increment}${rule.unit})`;
+                html += '<div style="margin-top: 8px;">Next: Try <strong>' + nextWeight + ' lbs</strong> (+' + rule.increment + rule.unit + ')';
                 if (rule.note) {
-                    html += `<br><small style="color: var(--text-dim);">Note: ${rule.note}</small>`;
+                    html += '<br><small style="color: var(--text-dim);">Note: ' + rule.note + '</small>';
                 }
-                html += `</div>`;
+                html += '</div>';
                 
-                // Auto-fill suggestion
                 if (!weightInput.value && lastWeights[name]) {
                     weightInput.value = nextWeight;
                 }
@@ -207,6 +231,41 @@ foreach ($workoutSets as $set) {
             } else {
                 hint.style.display = 'none';
             }
+        }
+        
+        function logSet(setId, targetWeight, targetReps, exName) {
+            let weight = targetWeight;
+            let reps = targetReps;
+            
+            if (!weight || weight == 0) {
+                const w = prompt('Weight for ' + exName + ' (lbs):');
+                if (w === null) return;
+                weight = parseFloat(w);
+            }
+            if (!reps || reps == 0) {
+                const r = prompt('Reps for ' + exName + ':');
+                if (r === null) return;
+                reps = parseInt(r);
+            }
+            
+            const confirmed = confirm('Log ' + exName + ':\n' + reps + ' reps @ ' + weight + ' lbs?\n\nClick OK to confirm, or Cancel to edit.');
+            
+            if (!confirmed) {
+                const w = prompt('Weight (lbs):', weight);
+                if (w === null) return;
+                const r = prompt('Reps:', reps);
+                if (r === null) return;
+                weight = parseFloat(w);
+                reps = parseInt(r);
+            }
+            
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/api/workout/set/complete';
+            const csrfToken = <?php echo json_encode(Security::csrfToken()); ?>;
+            form.innerHTML = '<input type="hidden" name="set_id" value="' + setId + '"><input type="hidden" name="weight" value="' + weight + '"><input type="hidden" name="reps" value="' + reps + '"><input type="hidden" name="csrf_token" value="' + csrfToken + '">';
+            document.body.appendChild(form);
+            form.submit();
         }
     </script>
 </body>
