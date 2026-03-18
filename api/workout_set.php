@@ -6,6 +6,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Validate CSRF token
+$csrfToken = $_POST['csrf_token'] ?? '';
+if (!Security::validateCsrfToken($csrfToken)) {
+    http_response_code(403);
+    header('Location: /workouts/create?error=csrf');
+    exit;
+}
+
 requireAuth();
 $db = getDB();
 
@@ -19,10 +27,16 @@ if (!$workout) {
     exit;
 }
 
+// Sanitize inputs
 $workoutId = $workout['id'];
-$exerciseId = $_POST['exercise_id'] ?? 0;
-$reps = $_POST['reps'] ?? 0;
-$weight = $_POST['weight'] ?? 0;
+$exerciseId = Security::sanitizeInt($_POST['exercise_id'] ?? 0, 0, 1);
+$reps = Security::sanitizeInt($_POST['reps'] ?? 0, 0, 0, 1000);
+$weight = Security::sanitizeFloat($_POST['weight'] ?? 0, 0, 0, 5000);
+
+if ($exerciseId <= 0) {
+    header('Location: /workouts/create?error=invalid_exercise');
+    exit;
+}
 
 // Get next set number for this exercise
 $stmt = $db->prepare("SELECT COUNT(*) as count FROM workout_sets WHERE workout_id = ? AND exercise_id = ?");

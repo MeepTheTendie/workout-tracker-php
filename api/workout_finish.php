@@ -6,6 +6,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Validate CSRF token
+$csrfToken = $_POST['csrf_token'] ?? '';
+if (!Security::validateCsrfToken($csrfToken)) {
+    http_response_code(403);
+    header('Location: /workouts/create?error=csrf');
+    exit;
+}
+
 requireAuth();
 $db = getDB();
 
