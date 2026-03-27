@@ -1,0 +1,91 @@
+{
+  "journal_metadata": {
+    "date": "2026-03-23",
+    "program_context": "Pro Results Personal Training logbook"
+  },
+  "workout_summary": {
+    "focus": "Lower Body & Functional Conditioning",
+    "notes": "Personal training session - Lower body emphasis with functional conditioning elements"
+  },
+  "exercises": [
+    {
+      "name": "Lunges",
+      "category": "Legs",
+      "sets": [
+        { "set_number": 1, "reps": 15, "weight_lbs": 0, "notes": "Bodyweight" }
+      ]
+    },
+    {
+      "name": "Sled Push",
+      "category": "Legs",
+      "sets": [
+        { "set_number": 1, "reps": 1, "weight_lbs": 45, "notes": "45 lbs added weight to sled" }
+      ]
+    },
+    {
+      "name": "Tire Flips",
+      "category": "Functional",
+      "equipment": "Red tire",
+      "sets": [
+        { "set_number": 1, "reps": 1, "notes": "Red tire - reps not specified" }
+      ]
+    },
+    {
+      "name": "Tire Squats",
+      "category": "Legs",
+      "equipment": "Red tire",
+      "sets": [
+        { "set_number": 1, "reps": 1, "notes": "Red tire - reps not specified" }
+      ]
+    },
+    {
+      "name": "Leg Extensions",
+      "category": "Legs",
+      "exercise_id": 42,
+      "milestone": "New upper bound hit at 105 lbs",
+      "notes": "Sequence repeated 2 times (times 2)",
+      "sets": [
+        { "set_number": 1, "reps": 10, "weight_lbs": 105 },
+        { "set_number": 2, "reps": 10, "weight_lbs": 85 },
+        { "set_number": 3, "reps": 15, "weight_lbs": 55 },
+        { "set_number": 4, "reps": 10, "weight_lbs": 105 },
+        { "set_number": 5, "reps": 10, "weight_lbs": 85 },
+        { "set_number": 6, "reps": 15, "weight_lbs": 55 }
+      ]
+    },
+    {
+      "name": "Back Extension",
+      "category": "Back",
+      "exercise_id": 41,
+      "sets": [
+        { "set_number": 1, "reps": 10, "weight_lbs": 115 },
+        { "set_number": 2, "reps": 10, "weight_lbs": 115 },
+        { "set_number": 3, "reps": 10, "weight_lbs": 115 },
+        { "set_number": 4, "reps": 10, "weight_lbs": 115 }
+      ]
+    },
+    {
+      "name": "Low Back - Roc It",
+      "category": "Back",
+      "exercise_id": 60,
+      "sets": [
+        { "set_number": 1, "reps": 10, "weight_lbs": 65 },
+        { "set_number": 2, "reps": 10, "weight_lbs": 65 },
+        { "set_number": 3, "reps": 10, "weight_lbs": 65 },
+        { "set_number": 4, "reps": 10, "weight_lbs": 85, "notes": "Extra set" }
+      ]
+    },
+    {
+      "name": "Hack Squat",
+      "category": "Legs",
+      "notes": "Warm-up exercise. Started at 80 lbs but completed at 103 lbs",
+      "sets": [
+        { "set_number": 1, "reps": 10, "weight_lbs": 103, "notes": "3 sets planned at 80 lbs, but completed at 103 lbs" },
+        { "set_number": 2, "reps": 10, "weight_lbs": 103 },
+        { "set_number": 3, "reps": 10, "weight_lbs": 103 }
+      ]
+    }
+  ],
+  "total_sets": 22,
+  "total_exercises": 8
+}

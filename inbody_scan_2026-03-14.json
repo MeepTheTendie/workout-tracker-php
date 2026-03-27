@@ -1,0 +1,36 @@
+{
+  "scan_metadata": {
+    "device": "InBody 270",
+    "date": "2026-03-14",
+    "time": "09:58",
+    "demographics": {
+      "age": 32,
+      "gender": "Male",
+      "height": "6' 0.0 in"
+    }
+  },
+  "core_composition_metrics": {
+    "total_body_weight_lbs": 291.8,
+    "skeletal_muscle_mass_lbs": 96.1,
+    "body_fat_mass_lbs": 125.4,
+    "percent_body_fat": 42.9,
+    "bmi": 41.9,
+    "basal_metabolic_rate_kcal": 2002,
+    "lean_body_mass_lbs": 166.5
+  },
+  "segmental_lean_analysis": {
+    "left_arm": { "mass_lbs": 10.71, "percentage": 118.3 },
+    "right_arm": { "mass_lbs": 10.71, "percentage": 118.4 },
+    "trunk": { "mass_lbs": 79.3, "percentage": 110.2 },
+    "left_leg": { "mass_lbs": 24.32, "percentage": 96.5 },
+    "right_leg": { "mass_lbs": 24.60, "percentage": 97.7 }
+  },
+  "user_annotations": {
+    "target_goal": "Decrease percent body fat by 30% from the current 42.9%",
+    "focus_areas": ["Left Arm", "Left Leg", "Percent Body Fat"]
+  },
+  "inbody_recommendations": {
+    "body_fat_mass_control_lbs": -95.9,
+    "lean_body_mass_control_lbs": 0.0
+  }
+}

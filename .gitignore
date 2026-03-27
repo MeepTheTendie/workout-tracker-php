@@ -1,0 +1,26 @@
+# Environment files
+.env
+.env.backup
+
+# Dependencies
+/vendor/
+/node_modules/
+
+# Storage
+/storage/*.db
+/storage/logs/
+/storage/cache/
+
+# PHPUnit
+.phpunit.cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Screenshots (optional - keep for now)
+# screenshots-for-nano-banana/
