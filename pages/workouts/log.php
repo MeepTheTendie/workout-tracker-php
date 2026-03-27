@@ -70,7 +70,14 @@ renderPage('Log Workout', function() use ($activeWorkout, $workoutId, $exercises
         <?php if (!empty($currentExercises)): ?>
             <?php foreach ($currentExercises as $exName => $data): ?>
                 <div class="exercise-card">
-                    <div class="exercise-card-title"><?= e($exName) ?></div>
+                    <div class="exercise-card-title" style="display: flex; justify-content: space-between; align-items: center;">
+                        <?= e($exName) ?>
+                        <form method="POST" action="/action/workouts/remove-exercise" style="display: inline;" onsubmit="return confirm('Remove <?= e($exName) ?> from this workout?');">
+                            <?= csrfField() ?>
+                            <input type="hidden" name="exercise_id" value="<?= $data['exercise_id'] ?>">
+                            <button type="submit" class="btn btn-small btn-danger" style="padding: 6px 10px; font-size: 12px; width: auto;">✕ REMOVE</button>
+                        </form>
+                    </div>
                     
                     <?php foreach ($data['sets'] as $i => $set): ?>
                         <div class="set-row">
