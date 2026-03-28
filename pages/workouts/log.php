@@ -80,19 +80,35 @@ renderPage('Log Workout', function() use ($activeWorkout, $workoutId, $exercises
                     </div>
                     
                     <?php foreach ($data['sets'] as $i => $set): ?>
-                        <div class="set-row">
+                        <div class="set-row" id="set-row-<?= $set['id'] ?>">
                             <span class="set-label">Set <?= $i + 1 ?></span>
                             
                             <?php if ($set['completed_at']): ?>
-                                <input type="text" class="set-input" value="<?= $set['reps'] ?>" readonly>
-                                <span class="set-unit">reps</span>
-                                <input type="text" class="set-input" value="<?= formatWeight($set['weight']) ?>" readonly>
-                                <span class="set-unit">lbs</span>
-                                <div class="set-check completed">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                    </svg>
+                                <!-- View Mode -->
+                                <div class="set-view" id="set-view-<?= $set['id'] ?>">
+                                    <input type="text" class="set-input" value="<?= $set['reps'] ?>" readonly>
+                                    <span class="set-unit">reps</span>
+                                    <input type="text" class="set-input" value="<?= formatWeight($set['weight']) ?>" readonly>
+                                    <span class="set-unit">lbs</span>
+                                    <div class="set-check completed">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </div>
+                                    <button type="button" class="btn btn-small" style="width: auto; padding: 8px 12px; margin-left: 8px; background: var(--accent); color: var(--bg);" onclick="showEditForm(<?= $set['id'] ?>)">✎ EDIT</button>
                                 </div>
+                                
+                                <!-- Edit Mode (hidden by default) -->
+                                <form method="POST" action="/action/workouts/edit-set" class="set-edit" id="set-edit-<?= $set['id'] ?>" style="display: none; flex: 1; align-items: center; gap: 8px;">
+                                    <?= csrfField() ?>
+                                    <input type="hidden" name="set_id" value="<?= $set['id'] ?>">
+                                    <input type="number" name="reps" value="<?= $set['reps'] ?>" class="set-input" required min="1">
+                                    <span class="set-unit">reps</span>
+                                    <input type="number" name="weight" value="<?= $set['weight'] ?>" class="set-input" required min="0" step="0.5">
+                                    <span class="set-unit">lbs</span>
+                                    <button type="submit" class="btn btn-small btn-success" style="width: auto; padding: 8px 12px;">SAVE</button>
+                                    <button type="button" class="btn btn-small" style="width: auto; padding: 8px 12px;" onclick="hideEditForm(<?= $set['id'] ?>)">CANCEL</button>
+                                </form>
                             <?php else: ?>
                                 <form method="POST" action="/action/workouts/complete-set" style="display: flex; align-items: center; gap: 8px; flex: 1;">
                                     <?= csrfField() ?>
@@ -165,6 +181,16 @@ renderPage('Log Workout', function() use ($activeWorkout, $workoutId, $exercises
         </form>
         
         <script>
+            function showEditForm(setId) {
+                document.getElementById('set-view-' + setId).style.display = 'none';
+                document.getElementById('set-edit-' + setId).style.display = 'flex';
+            }
+            
+            function hideEditForm(setId) {
+                document.getElementById('set-edit-' + setId).style.display = 'none';
+                document.getElementById('set-view-' + setId).style.display = 'flex';
+            }
+            
             const lastWeights = <?= json_encode($lastWeights) ?>;
             
             function showProgression() {

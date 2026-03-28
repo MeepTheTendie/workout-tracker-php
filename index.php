@@ -48,6 +48,7 @@ $routes = [
     'action/workouts/start' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/workouts/start.php'],
     'action/workouts/add-set' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/workouts/add-set.php'],
     'action/workouts/complete-set' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/workouts/complete-set.php'],
+    'action/workouts/edit-set' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/workouts/edit-set.php'],
     'action/workouts/finish' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/workouts/finish.php'],
     
     // Routines - Pages (GET)
@@ -71,6 +72,10 @@ $routes = [
     
     // PRs
     'prs' => ['method' => 'GET', 'auth' => true, 'file' => 'pages/prs.php'],
+    
+    // Cardio
+    'cardio' => ['method' => 'GET', 'auth' => true, 'file' => 'pages/cardio.php'],
+    'action/cardio/add' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/cardio/add.php'],
 ];
 
 // Find route
