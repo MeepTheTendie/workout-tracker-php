@@ -1,6 +1,9 @@
 <?php
 /**
  * Workout Detail View Page
+ * 
+ * Shows complete details of a single workout including
+ * all exercises, sets, weights, and volume calculations.
  */
 
 $userId = currentUserId();
@@ -52,63 +55,60 @@ foreach ($sets as $set) {
 
 $duration = 0;
 if ($workout['ended_at'] && $workout['started_at']) {
-    $duration = (int)(($workout['ended_at'] - $workout['started_at']) / 1000 / 60); // minutes
+    $duration = (int)(($workout['ended_at'] - $workout['started_at']) / 1000 / 60);
 }
 
-renderPage('Workout Details', function() use ($workout, $exercises, $totalVolume, $totalSets, $duration) {
+$workoutName = $workout['notes'] ?: 'Workout';
+
+renderPage('Workout Details', function() use ($workout, $workoutName, $exercises, $totalVolume, $totalSets, $duration) {
     ?>
-    <h1>Workout Details</h1>
+    <h1><?= e($workoutName) ?></h1>
     
-    <div class="card" style="margin-bottom: 24px;">
-        <div class="stat-card" style="background: transparent; border: none;">
-            <div class="stat-value"><?= formatDate((int)$workout['started_at']) ?></div>
-        </div>
+    <!-- Workout Summary Card -->
+    <div class="workout-summary-card">
+        <div class="workout-summary-date"><?= formatDate((int)$workout['started_at']) ?></div>
         
         <div class="stats-grid" style="margin-top: 16px;">
-            <div class="stat-card">
+            <div class="stat-box">
                 <div class="stat-value"><?= $totalSets ?></div>
                 <div class="stat-label">Sets</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-box">
                 <div class="stat-value"><?= number_format($totalVolume / 1000, 1) ?>k</div>
-                <div class="stat-label">Lbs</div>
+                <div class="stat-label">Volume</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-box">
                 <div class="stat-value"><?= $duration ?></div>
                 <div class="stat-label">Minutes</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-box">
                 <div class="stat-value"><?= count($exercises) ?></div>
                 <div class="stat-label">Exercises</div>
             </div>
         </div>
-        
-        <?php if ($workout['notes']): ?>
-            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-dim);">
-                <?= e($workout['notes']) ?>
-            </div>
-        <?php endif; ?>
     </div>
     
-    <h2>Exercises</h2>
+    <!-- Exercise Details -->
+    <div class="stats-section-title" style="margin-top: 24px;">Exercises</div>
     
     <?php foreach ($exercises as $exName => $data): ?>
-        <div class="exercise-block">
-            <div class="exercise-header">
-                <span class="exercise-name"><?= e($exName) ?></span>
+        <div class="exercise-detail-card">
+            <div class="exercise-detail-header">
+                <span class="exercise-detail-name"><?= e($exName) ?></span>
+                <span class="exercise-detail-volume"><?= number_format($data['volume']) ?> lbs</span>
             </div>
             
-            <?php foreach ($data['sets'] as $set): ?>
-                <div class="set-row">
-                    <span class="set-number">Set <?= $set['set_number'] ?></span>
-                    <span class="set-complete">
-                        <?= $set['reps'] ?> reps @ <?= formatWeight($set['weight']) ?>
-                    </span>
-                </div>
-            <?php endforeach; ?>
-            
-            <div class="volume-display">
-                Total: <?= number_format($data['volume']) ?> lbs
+            <div class="exercise-detail-sets">
+                <?php foreach ($data['sets'] as $set): ?>
+                    <div class="exercise-detail-set <?= $set['completed_at'] ? 'completed' : '' ?>">
+                        <span class="set-number">Set <?= $set['set_number'] ?></span>
+                        <span class="set-weight"><?= formatWeight($set['weight']) ?></span>
+                        <span class="set-reps"><?= $set['reps'] ?> reps</span>
+                        <?php if ($set['completed_at']): ?>
+                            <span class="set-check">✓</span>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
     <?php endforeach; ?>

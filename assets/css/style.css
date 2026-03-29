@@ -724,6 +724,171 @@ h3 {
     }
 }
 
+/* Workout List (History) */
+.workout-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.workout-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, transform 0.1s;
+}
+
+.workout-list-item:hover {
+    border-color: var(--accent);
+}
+
+.workout-list-content {
+    flex: 1;
+}
+
+.workout-list-date {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.workout-list-name {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.workout-list-meta {
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+.workout-list-exercises {
+    color: var(--text-dim);
+}
+
+.workout-list-chevron {
+    color: var(--text-dim);
+    font-size: 24px;
+    margin-left: 12px;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.pagination-info {
+    padding: 8px 16px;
+    color: var(--text-dim);
+    font-size: 13px;
+}
+
+/* Workout Summary Card */
+.workout-summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.workout-summary-date {
+    font-size: 14px;
+    color: var(--accent);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+/* Exercise Detail Card */
+.exercise-detail-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.exercise-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.exercise-detail-name {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.exercise-detail-volume {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.exercise-detail-sets {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.exercise-detail-set {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--surface-elevated);
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.exercise-detail-set.completed {
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid var(--success);
+}
+
+.exercise-detail-set .set-number {
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-size: 11px;
+    min-width: 50px;
+}
+
+.exercise-detail-set .set-weight {
+    font-weight: 700;
+    min-width: 70px;
+}
+
+.exercise-detail-set .set-reps {
+    color: var(--text-dim);
+    flex: 1;
+}
+
+.exercise-detail-set .set-check {
+    color: var(--success);
+    font-weight: 700;
+}
+
 /* Print styles */
 @media print {
     nav {
