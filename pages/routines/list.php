@@ -1,10 +1,14 @@
 <?php
 /**
- * Routines List Page - Redesigned
+ * Routines List Page
+ * 
+ * Displays user's workout routines with exercise summaries
+ * and quick-start actions.
  */
 
 $userId = currentUserId();
 
+// Fetch all routines with exercise counts
 $routines = dbFetchAll(
     "SELECT r.*, COUNT(re.id) as exercise_count 
      FROM routines r 
@@ -37,15 +41,16 @@ renderPage('Routines', function() use ($routines) {
                  FROM routine_exercises re 
                  JOIN exercises e ON re.exercise_id = e.id 
                  WHERE re.routine_id = ? 
-                 ORDER BY re.order_index",
+                 ORDER BY re.order_index
+                 LIMIT 5",
                 [$routine['id']]
             );
+            
+            $totalExercises = (int)$routine['exercise_count'];
         ?>
             <div class="routine-card">
                 <div class="routine-card-header">
-                    <div>
-                        <div class="routine-card-title"><?= e($routine['name']) ?></div>
-                    </div>
+                    <div class="routine-card-title"><?= e($routine['name']) ?></div>
                     <span class="routine-card-chevron">›</span>
                 </div>
                 
@@ -58,7 +63,16 @@ renderPage('Routines', function() use ($routines) {
                         <?php foreach ($exercises as $exercise): ?>
                             <li><?= e($exercise['name']) ?></li>
                         <?php endforeach; ?>
+                        <?php if ($totalExercises > 5): ?>
+                            <li style="color: var(--text-dim); font-style: italic;">
+                                + <?= $totalExercises - 5 ?> more
+                            </li>
+                        <?php endif; ?>
                     </ul>
+                <?php else: ?>
+                    <div class="routine-card-description" style="font-style: italic;">
+                        No exercises added yet
+                    </div>
                 <?php endif; ?>
                 
                 <div class="routine-card-actions">
@@ -70,11 +84,11 @@ renderPage('Routines', function() use ($routines) {
                     
                     <a href="/routines/edit?id=<?= $routine['id'] ?>" class="btn btn-small btn-secondary">EDIT</a>
                     
-                    <form method="POST" action="/action/routines/delete" style="width: auto;">
+                    <form method="POST" action="/action/routines/delete" style="width: auto;" 
+                          onsubmit="return confirm('Delete &quot;<?= e($routine['name']) ?>&quot;? This cannot be undone.')">
                         <?= csrfField() ?>
                         <input type="hidden" name="routine_id" value="<?= $routine['id'] ?>">
-                        <button type="submit" class="btn btn-small btn-danger" 
-                                onclick="return confirm('Delete this routine?')" style="width: auto;">×</button>
+                        <button type="submit" class="btn btn-icon" title="Delete routine">×</button>
                     </form>
                 </div>
             </div>

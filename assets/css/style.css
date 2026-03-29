@@ -385,9 +385,9 @@ h3 {
     font-size: 20px;
 }
 
-/* Routines */
+/* Routines - Polished Design from Mockup */
 .routines-header {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .routine-card {
@@ -395,7 +395,12 @@ h3 {
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 16px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s, transform 0.1s;
+}
+
+.routine-card:hover {
+    border-color: var(--accent);
 }
 
 .routine-card-header {
@@ -409,41 +414,109 @@ h3 {
     font-size: 14px;
     font-weight: 700;
     text-transform: uppercase;
+    color: var(--text);
+    letter-spacing: 0.5px;
 }
 
 .routine-card-chevron {
     color: var(--text-dim);
+    font-size: 20px;
+    line-height: 1;
 }
 
 .routine-card-description {
     font-size: 12px;
     color: var(--text-dim);
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    line-height: 1.5;
 }
 
 .routine-card-exercises {
-    list-style: disc;
-    padding-left: 16px;
+    list-style: none;
+    padding-left: 0;
     margin-bottom: 16px;
 }
 
 .routine-card-exercises li {
     font-size: 12px;
     color: var(--text-dim);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    padding-left: 16px;
+    position: relative;
+}
+
+.routine-card-exercises li::before {
+    content: '•';
+    position: absolute;
+    left: 4px;
+    color: var(--accent);
 }
 
 .routine-card-actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
+    align-items: center;
 }
 
-.routine-card-actions .btn {
+.routine-card-actions .btn-primary {
     flex: 1;
+    background: var(--accent);
+    border-color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.routine-card-actions .btn-secondary {
+    flex: 0 0 auto;
+    min-width: 60px;
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-dim);
+}
+
+.routine-card-actions .btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 .routine-card-actions .btn-icon {
     flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 8px;
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-dim);
+    font-size: 18px;
+    line-height: 1;
+}
+
+.routine-card-actions .btn-icon:hover {
+    border-color: var(--error);
+    color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Routine Menu Button (three dots) */
+.routine-menu-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+.routine-menu-btn:hover {
+    background: var(--surface-elevated);
+    color: var(--text);
 }
 
 /* Workout Log */
