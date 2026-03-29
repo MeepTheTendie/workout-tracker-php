@@ -3,33 +3,31 @@
 
 USE workout_tracker;
 
--- Index for fetching user's workouts (used in dashboard, history)
-CREATE INDEX IF NOT EXISTS idx_workouts_user_ended_started 
-ON workouts(user_id, ended_at, started_at DESC);
+-- Drop existing indexes if they exist (to avoid errors)
+DROP INDEX IF EXISTS idx_workouts_user_ended_started ON workouts;
+DROP INDEX IF EXISTS idx_workout_sets_workout_completed ON workout_sets;
+DROP INDEX IF EXISTS idx_workout_sets_exercise ON workout_sets;
+DROP INDEX IF EXISTS idx_cardio_user_completed ON cardio_sessions;
+DROP INDEX IF EXISTS idx_bodycomp_user_date ON body_composition_scans;
+DROP INDEX IF EXISTS idx_exercises_category ON exercises;
 
--- Index for active workout lookups
-CREATE INDEX IF NOT EXISTS idx_workouts_user_active 
-ON workouts(user_id, ended_at) WHERE ended_at IS NULL;
+-- Index for fetching user's workouts (used in dashboard, history)
+ALTER TABLE workouts ADD INDEX idx_workouts_user_ended_started (user_id, ended_at, started_at DESC);
 
 -- Index for workout sets lookups
-CREATE INDEX IF NOT EXISTS idx_workout_sets_workout_completed 
-ON workout_sets(workout_id, completed_at);
+ALTER TABLE workout_sets ADD INDEX idx_workout_sets_workout_completed (workout_id, completed_at);
 
 -- Index for exercise lookups in sets
-CREATE INDEX IF NOT EXISTS idx_workout_sets_exercise 
-ON workout_sets(exercise_id);
+ALTER TABLE workout_sets ADD INDEX idx_workout_sets_exercise (exercise_id);
 
 -- Index for cardio sessions
-CREATE INDEX IF NOT EXISTS idx_cardio_user_completed 
-ON cardio_sessions(user_id, completed_at);
+ALTER TABLE cardio_sessions ADD INDEX idx_cardio_user_completed (user_id, completed_at);
 
 -- Index for body composition scans
-CREATE INDEX IF NOT EXISTS idx_bodycomp_user_date 
-ON body_composition_scans(user_id, scan_date);
+ALTER TABLE body_composition_scans ADD INDEX idx_bodycomp_user_date (user_id, scan_date);
 
 -- Index for exercise categories
-CREATE INDEX IF NOT EXISTS idx_exercises_category 
-ON exercises(category);
+ALTER TABLE exercises ADD INDEX idx_exercises_category (category);
 
 -- Analyze tables for query optimizer
 ANALYZE TABLE workouts;
