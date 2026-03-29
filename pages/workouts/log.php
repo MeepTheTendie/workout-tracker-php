@@ -49,14 +49,27 @@ if ($workoutId) {
     }
 }
 
-renderPage('Log Workout', function() use ($activeWorkout, $workoutId, $exercisesByCategory, $lastWeights, $currentExercises) {
+// Calculate total workout volume
+$totalVolume = 0;
+foreach ($currentExercises as $exName => $data) {
+    $totalVolume += $data['totalVolume'];
+}
+
+$workoutName = $activeWorkout['notes'] ?? '';
+
+renderPage('Log Workout', function() use ($activeWorkout, $workoutId, $exercisesByCategory, $lastWeights, $currentExercises, $totalVolume, $workoutName) {
     ?>
     <h1><?= $activeWorkout ? 'Workout In Progress' : 'Start Workout' ?></h1>
     
     <?php if (!$activeWorkout): ?>
+        <!-- Start New Workout Form with Name -->
         <form method="POST" action="/action/workouts/start" style="margin-bottom: 24px;">
             <?= csrfField() ?>
-            <button type="submit" class="btn btn-primary">
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label">WORKOUT NAME (Optional)</label>
+                <input type="text" name="workout_name" class="form-input" placeholder="e.g., Upper Push, Leg Day, etc." style="width: 100%;">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
                 START NEW WORKOUT
             </button>
         </form>
@@ -66,6 +79,53 @@ renderPage('Log Workout', function() use ($activeWorkout, $workoutId, $exercises
         </p>
         
     <?php else: ?>
+        
+        <!-- Workout Name Header -->
+        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Workout Name</div>
+                    <div id="workout-name-display" style="font-size: 18px; font-weight: 700;">
+                        <?= $workoutName ? htmlspecialchars($workoutName) : '<span style="color: var(--text-dim);">Unnamed Workout</span>' ?>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-small" style="width: auto;" onclick="toggleNameEdit()">✎ Edit</button>
+            </div>
+            
+            <!-- Hidden Edit Form -->
+            <form id="workout-name-form" method="POST" action="/action/workouts/update-name" style="display: none;">
+                <?= csrfField() ?>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" name="workout_name" value="<?= htmlspecialchars($workoutName) ?>" class="form-input" placeholder="Workout name..." style="flex: 1;">
+                    <button type="submit" class="btn btn-small btn-success" style="width: auto;">Save</button>
+                    <button type="button" class="btn btn-small" style="width: auto;" onclick="toggleNameEdit()">Cancel</button>
+                </div>
+            </form>
+            
+            <!-- Workout Stats -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                <div style="text-align: center;">
+                    <div style="font-size: 18px; font-weight: 700; color: var(--accent);"><?= count($currentExercises) ?></div>
+                    <div style="font-size: 10px; color: var(--text-dim);">Exercises</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 18px; font-weight: 700; color: var(--accent);">
+                        <?php 
+                            $totalSets = 0;
+                            foreach ($currentExercises as $ex) {
+                                $totalSets += count($ex['sets']);
+                            }
+                            echo $totalSets;
+                        ?>
+                    </div>
+                    <div style="font-size: 10px; color: var(--text-dim);">Sets</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 18px; font-weight: 700; color: var(--accent);"><?= number_format($totalVolume / 1000, 1) ?>k</div>
+                    <div style="font-size: 10px; color: var(--text-dim);">Volume</div>
+                </div>
+            </div>
+        </div>
         
         <?php if (!empty($currentExercises)): ?>
             <?php foreach ($currentExercises as $exName => $data): ?>
@@ -189,6 +249,19 @@ renderPage('Log Workout', function() use ($activeWorkout, $workoutId, $exercises
             function hideEditForm(setId) {
                 document.getElementById('set-edit-' + setId).style.display = 'none';
                 document.getElementById('set-view-' + setId).style.display = 'flex';
+            }
+            
+            function toggleNameEdit() {
+                const display = document.getElementById('workout-name-display');
+                const form = document.getElementById('workout-name-form');
+                
+                if (form.style.display === 'none') {
+                    form.style.display = 'block';
+                    display.style.display = 'none';
+                } else {
+                    form.style.display = 'none';
+                    display.style.display = 'block';
+                }
             }
             
             const lastWeights = <?= json_encode($lastWeights) ?>;

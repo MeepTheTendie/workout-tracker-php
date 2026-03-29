@@ -76,6 +76,12 @@ $routes = [
     // Cardio
     'cardio' => ['method' => 'GET', 'auth' => true, 'file' => 'pages/cardio.php'],
     'action/cardio/add' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/cardio/add.php'],
+    
+    // Export
+    'export' => ['method' => 'GET', 'auth' => true, 'file' => 'pages/export.php'],
+    
+    // Workout name update
+    'action/workouts/update-name' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/workouts/update-name.php'],
 ];
 
 // Find route

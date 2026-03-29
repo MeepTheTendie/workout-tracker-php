@@ -1,7 +1,9 @@
 <?php
 /**
- * Stats Page - Redesigned
+ * Stats Page - Enhanced with 1RM estimates and trends
  */
+
+require_once __DIR__ . '/../includes/analytics.php';
 
 $userId = currentUserId();
 
@@ -38,6 +40,7 @@ $thisWeekWorkouts = dbFetchOne(
 $exerciseStats = dbFetchAll(
     "SELECT 
         e.name,
+        e.id as exercise_id,
         COUNT(*) as set_count,
         MAX(ws.weight) as max_weight,
         SUM(ws.weight * ws.reps) as total_volume
@@ -45,13 +48,42 @@ $exerciseStats = dbFetchAll(
      JOIN exercises e ON ws.exercise_id = e.id 
      JOIN workouts w ON ws.workout_id = w.id 
      WHERE w.user_id = ? AND w.ended_at IS NOT NULL AND ws.completed_at IS NOT NULL
-     GROUP BY e.id 
+     GROUP BY e.id, e.name
      ORDER BY total_volume DESC 
      LIMIT 10",
     [$userId]
 );
 
-renderPage('Statistics', function() use ($totalWorkouts, $totalVolume, $totalSets, $thisWeekWorkouts, $exerciseStats) {
+// Get 1RM estimates for top lifts
+$oneRMData = [];
+foreach ($exerciseStats as $stat) {
+    $bestSet = dbFetchOne(
+        "SELECT weight, reps 
+         FROM workout_sets ws
+         JOIN workouts w ON ws.workout_id = w.id
+         WHERE w.user_id = ? AND ws.exercise_id = ? AND ws.completed_at IS NOT NULL
+         ORDER BY (weight * reps) DESC
+         LIMIT 1",
+        [$userId, $stat['exercise_id']]
+    );
+    
+    if ($bestSet && $bestSet['reps'] <= 12) {
+        $oneRM = calculateOneRM((float)$bestSet['weight'], (int)$bestSet['reps']);
+        if ($oneRM) {
+            $oneRMData[] = [
+                'exercise' => $stat['name'],
+                'weight' => $bestSet['weight'],
+                'reps' => $bestSet['reps'],
+                'estimated_1rm' => $oneRM
+            ];
+        }
+    }
+}
+
+// Monthly trends
+$monthlyStats = getMonthlyStats($userId, 6);
+
+renderPage('Statistics', function() use ($totalWorkouts, $totalVolume, $totalSets, $thisWeekWorkouts, $exerciseStats, $oneRMData, $monthlyStats) {
     ?>
     <h1>STATISTICS</h1>
     
@@ -75,8 +107,48 @@ renderPage('Statistics', function() use ($totalWorkouts, $totalVolume, $totalSet
         </div>
     </div>
     
+    <!-- Monthly Volume Trend -->
+    <?php if (!empty($monthlyStats)): ?>
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 24px 0;">
+        <div style="font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;">Monthly Volume Trend</div>
+        <div style="display: flex; gap: 8px; align-items: flex-end; height: 100px; padding-bottom: 30px;">
+            <?php 
+                $maxVolume = max(array_column($monthlyStats, 'volume')) ?: 1;
+                foreach ($monthlyStats as $stat): 
+                    $height = ($stat['volume'] / $maxVolume) * 80;
+            ?>
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                    <div style="font-size: 10px; color: var(--text-dim);"><?= number_format($stat['volume'] / 1000, 1) ?>k</div>
+                    <div style="width: 100%; height: <?= $height ?>px; background: linear-gradient(to top, var(--accent), var(--accent-hover)); border-radius: 4px 4px 0 0; min-height: 4px;"></div>
+                    <div style="font-size: 10px; color: var(--text); font-weight: 600;"><?= $stat['workouts'] ?></div>
+                    <div style="font-size: 9px; color: var(--text-dim); white-space: nowrap;"><?= $stat['month_label'] ?></div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+    
+    <!-- 1RM Estimates -->
+    <?php if (!empty($oneRMData)): ?>
+    <div class="stats-section-title" style="margin-top: 32px;">ESTIMATED 1 REP MAX</div>
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <?php foreach (array_slice($oneRMData, 0, 5) as $pr): ?>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border);">
+                <div>
+                    <div style="font-weight: 600;"><?= e($pr['exercise']) ?></div>
+                    <div style="font-size: 12px; color: var(--text-dim);">Best: <?= $pr['weight'] ?> × <?= $pr['reps'] ?></div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 20px; font-weight: 700; color: var(--accent);"><?= $pr['estimated_1rm'] ?> <span style="font-size: 12px; color: var(--text-dim);">lbs</span></div>
+                    <div style="font-size: 10px; color: var(--text-dim);">Est. 1RM</div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+    
     <!-- Top Exercises -->
-    <div class="stats-section-title">TOP EXERCISES BY VOLUME</div>
+    <div class="stats-section-title" style="margin-top: 32px;">TOP EXERCISES BY VOLUME</div>
     
     <?php if (empty($exerciseStats)): ?>
         <div class="empty">
@@ -92,5 +164,17 @@ renderPage('Statistics', function() use ($totalWorkouts, $totalVolume, $totalSet
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
+    
+    <!-- Export Link -->
+    <div style="margin-top: 32px; text-align: center;">
+        <a href="/export" class="btn btn-small" style="width: auto; display: inline-flex; align-items: center; gap: 8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export Your Data
+        </a>
+    </div>
     <?php
 });
