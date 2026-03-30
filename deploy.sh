@@ -1,72 +1,49 @@
 #!/bin/bash
 #
 # Deployment Script for Workout Tracker
-# Usage: ./deploy.sh [production|staging]
+# Pushes to GitHub and pulls on production server
 #
 
 set -e
 
-ENVIRONMENT=${1:-production}
-TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-BACKUP_DIR="/var/backups/workout-tracker"
-DEPLOY_DIR="/var/www/workout-tracker"
-SOURCE_DIR="$(pwd)"
+SERVER="root@162.55.208.142"
+SERVER_DIR="/var/www/workout-tracker-v2"
+SSH_KEY="~/.ssh/hetzner"
 
-echo "🚀 Starting deployment to $ENVIRONMENT..."
-echo "📅 Timestamp: $TIMESTAMP"
+echo "🚀 Deploying workout-tracker..."
+echo ""
 
-# Create backup directory
-mkdir -p "$BACKUP_DIR"
-
-# Backup database before deploy
-echo "💾 Backing up database..."
-if command -v mysqldump &> /dev/null; then
-    mysqldump -u "${DB_USER:-meep}" -p"${DB_PASS}" workout_tracker > \
-        "$BACKUP_DIR/workout-tracker-db-$TIMESTAMP.sql" 2>/dev/null || \
-        echo "⚠️  Database backup failed (may need credentials)"
-else
-    echo "⚠️  mysqldump not available, skipping DB backup"
+# Step 1: Check git status
+echo "📋 Checking git status..."
+if [ -n "$(git status --porcelain)" ]; then
+    echo "❌ You have uncommitted changes. Commit first:"
+    git status --short
+    exit 1
 fi
+echo "✅ Working tree clean"
+echo ""
 
-# Backup current deployment (if exists)
-if [ -d "$DEPLOY_DIR" ]; then
-    echo "📦 Backing up current deployment..."
-    cp -r "$DEPLOY_DIR" "$BACKUP_DIR/workout-tracker-code-$TIMESTAMP"
-fi
+# Step 2: Show what's being deployed
+echo "📝 Last 3 commits:"
+git log --oneline -3
+echo ""
 
-# Create deployment directory
-mkdir -p "$DEPLOY_DIR"
+# Step 3: Pull to ensure we're up to date
+echo "🔄 Syncing with remote..."
+git pull origin master
+echo ""
 
-# Copy files
-echo "📂 Copying files..."
-cp -r "$SOURCE_DIR"/* "$DEPLOY_DIR/"
+# Step 4: Push to GitHub
+echo "📤 Pushing to GitHub..."
+git push origin master
+echo ""
 
-# Copy .env if it doesn't exist
-if [ ! -f "$DEPLOY_DIR/.env" ]; then
-    echo "⚠️  Creating .env from example - PLEASE UPDATE WITH REAL VALUES!"
-    cp "$DEPLOY_DIR/.env.example" "$DEPLOY_DIR/.env"
-fi
+# Step 5: Deploy to production
+echo "🚀 Deploying to production server..."
+ssh -i "$SSH_KEY" "$SERVER" "cd $SERVER_DIR && git pull origin master"
+echo ""
 
-# Set permissions
-echo "🔐 Setting permissions..."
-chown -R www-data:www-data "$DEPLOY_DIR"
-chmod 755 "$DEPLOY_DIR"
-chmod 644 "$DEPLOY_DIR"/*.php
-chmod 644 "$DEPLOY_DIR"/*.md
-chmod 644 "$DEPLOY_DIR/.env.example"
-chmod 600 "$DEPLOY_DIR/.env" 2>/dev/null || true
-chmod -R 755 "$DEPLOY_DIR/storage"
-
-# Ensure storage is writable
-mkdir -p "$DEPLOY_DIR/storage/logs"
-mkdir -p "$DEPLOY_DIR/storage/cache"
-chmod -R 775 "$DEPLOY_DIR/storage"
-
+# Step 6: Verify
 echo "✅ Deployment complete!"
 echo ""
-echo "Next steps:"
-echo "1. Update .env file with production credentials if needed"
-echo "2. Test the application at your domain"
-echo "3. Check storage/logs/ for any errors"
-echo ""
-echo "Backup location: $BACKUP_DIR/workout-tracker-code-$TIMESTAMP"
+echo "🌐 Live site: https://myworkouttracker.xyz"

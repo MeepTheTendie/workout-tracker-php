@@ -1,33 +1,27 @@
 # Deployment Guide
 
-**Last Updated:** March 27, 2026
-
-## Quick Deploy (One-Liner)
+## Quick Deploy
 
 ```bash
-ssh root@162.55.208.142 "cd /var/www/workout-tracker-v2 && git pull origin master"
+./deploy.sh
 ```
 
-That's it. Done.
+That's it. The script handles everything.
 
 ---
 
-## Full Deploy Steps
+## Manual Deploy
 
-If you need to do it manually:
+If you prefer to do it step by step:
 
 ```bash
-# SSH to server
-ssh root@162.55.208.142
+# 1. Commit and push changes
+git add .
+git commit -m "Your message"
+git push origin master
 
-# Go to app directory
-cd /var/www/workout-tracker-v2
-
-# Pull latest changes
-git pull origin master
-
-# Check status (should be clean)
-git status
+# 2. Pull on server
+ssh root@162.55.208.142 "cd /var/www/workout-tracker-v2 && git pull origin master"
 ```
 
 ---
@@ -44,52 +38,47 @@ git status
 
 ---
 
-## Git Setup on Production
-
-The production server now has git properly configured:
-- Repository cloned from: `https://github.com/MeepTheTendie/workout-tracker.git`
-- Active branch: `master`
-- `.env` file is preserved (not in git)
-- Permissions set: `www-data:www-data`
-
----
-
 ## Troubleshooting
 
 ### "Permission denied"
 ```bash
-# Fix permissions
+ssh -i ~/.ssh/hetzner root@162.55.208.142
 chown -R www-data:www-data /var/www/workout-tracker-v2
 chmod 600 /var/www/workout-tracker-v2/.env
 ```
 
-### "Merge conflicts"
+### "Merge conflicts" on server
 ```bash
-# Force pull (nuclear option)
+ssh -i ~/.ssh/hetzner root@162.55.208.142
 cd /var/www/workout-tracker-v2
-git fetch origin master
+git fetch origin
 git reset --hard origin/master
 ```
 
-### ".env file missing"
+### ".env file missing" on server
 ```bash
-# Recreate from example
+ssh -i ~/.ssh/hetzner root@162.55.208.142
 cd /var/www/workout-tracker-v2
 cp .env.example .env
 nano .env  # Add real credentials
 chmod 600 .env
 ```
 
+### Uncommitted changes locally
+```bash
+git status        # See what changed
+git diff          # Review changes
+git add .         # Stage all
+git commit -m " " # Commit
+git push          # Push
+./deploy.sh       # Deploy
+```
+
 ---
 
 ## Deploy Checklist
 
-- [ ] Committed all changes locally
-- [ ] Pushed to GitHub (`git push origin master`)
-- [ ] Ran deploy command
-- [ ] Site still loads (https://myworkouttracker.xyz)
+- [ ] Changes committed locally
+- [ ] `./deploy.sh` ran successfully
+- [ ] Site loads: https://myworkouttracker.xyz
 - [ ] New feature works
-
----
-
-**Remember:** Deploy is just `git pull`. Don't overthink it.
