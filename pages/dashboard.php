@@ -89,7 +89,7 @@ renderPage('Dashboard', function() use ($user, $totalWorkouts, $totalVolume, $to
             ?>
                 <a href="/workouts/view?id=<?= $workout['id'] ?>" class="recent-workout-item" style="text-decoration:none;color:inherit;padding:14px 16px;">
                     <div class="recent-workout-info">
-                        <div class="recent-workout-date"><?= formatDate((int)$workout['started_at']) ?> - <?= htmlspecialchars($workoutName) ?></div>
+                        <div class="recent-workout-date"><?= formatDate((int)$workout['started_at']) ?> - <?= e($workoutName) ?></div>
                     </div>
                     <span class="recent-workout-chevron">›</span>
                 </a>

@@ -109,7 +109,8 @@ function dbInsert(string $table, array $data): int
     
     $db = getDB();
     
-    $columns = implode('`, `', array_keys($data));
+    // Escape column names
+    $columns = implode('`, `', array_map('escapeIdentifier', array_keys($data)));
     $placeholders = implode(', ', array_fill(0, count($data), '?'));
     
     $sql = "INSERT INTO `{$table}` (`{$columns}`) VALUES ({$placeholders})";
@@ -141,7 +142,7 @@ function dbUpdate(string $table, array $data, string $where, array $whereParams 
     $values = [];
     
     foreach ($data as $column => $value) {
-        $sets[] = "`{$column}` = ?";
+        $sets[] = "`" . escapeIdentifier($column) . "` = ?";
         $values[] = $value;
     }
     
@@ -166,6 +167,25 @@ function dbDelete(string $table, string $where, array $params = []): int
     $sql = "DELETE FROM `{$table}` WHERE {$where}";
     $stmt = dbQuery($sql, $params);
     return $stmt->rowCount();
+}
+
+/**
+ * Escape SQL identifier (column/table name)
+ * 
+ * Prevents SQL injection via column/table names by only allowing
+ * alphanumeric characters and underscores.
+ * 
+ * @param string $identifier The identifier to escape
+ * @return string The sanitized identifier
+ * @throws InvalidArgumentException If identifier contains invalid characters
+ */
+function escapeIdentifier(string $identifier): string
+{
+    // Only allow alphanumeric and underscore
+    if (!preg_match('/^[a-zA-Z0-9_]+$/', $identifier)) {
+        throw new InvalidArgumentException("Invalid SQL identifier: " . $identifier);
+    }
+    return $identifier;
 }
 
 /**

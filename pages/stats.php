@@ -109,19 +109,20 @@ renderPage('Statistics', function() use ($totalWorkouts, $totalVolume, $totalSet
     
     <!-- Monthly Volume Trend -->
     <?php if (!empty($monthlyStats)): ?>
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 24px 0;">
-        <div style="font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;">Monthly Volume Trend</div>
-        <div style="display: flex; gap: 8px; align-items: flex-end; height: 100px; padding-bottom: 30px;">
+    <div class="stats-graph-card">
+        <div class="stats-graph-title">Monthly Volume Trend</div>
+        <div class="stats-graph-container">
             <?php 
                 $maxVolume = max(array_column($monthlyStats, 'volume')) ?: 1;
                 foreach ($monthlyStats as $stat): 
-                    $height = ($stat['volume'] / $maxVolume) * 80;
+                    $heightPercent = ($stat['volume'] / $maxVolume) * 100;
+                    $barHeight = max(4, min(100, $heightPercent));
             ?>
-                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-                    <div style="font-size: 10px; color: var(--text-dim);"><?= number_format($stat['volume'] / 1000, 1) ?>k</div>
-                    <div style="width: 100%; height: <?= $height ?>px; background: linear-gradient(to top, var(--accent), var(--accent-hover)); border-radius: 4px 4px 0 0; min-height: 4px;"></div>
-                    <div style="font-size: 10px; color: var(--text); font-weight: 600;"><?= $stat['workouts'] ?></div>
-                    <div style="font-size: 9px; color: var(--text-dim); white-space: nowrap;"><?= $stat['month_label'] ?></div>
+                <div class="stats-graph-bar-wrapper">
+                    <div class="stats-graph-value"><?= number_format($stat['volume'] / 1000, 0) ?>k</div>
+                    <div class="stats-graph-bar" style="height: <?= $barHeight ?>%;"></div>
+                    <div class="stats-graph-count"><?= $stat['workouts'] ?></div>
+                    <div class="stats-graph-month"><?= $stat['month_label'] ?></div>
                 </div>
             <?php endforeach; ?>
         </div>

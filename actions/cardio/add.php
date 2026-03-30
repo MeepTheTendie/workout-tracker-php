@@ -6,11 +6,11 @@
 requireCsrf();
 
 $userId = currentUserId();
-$sessionType = $_POST['session_type'] ?? 'bike';
+$sessionType = stringParam($_POST['session_type'] ?? 'bike');
 $duration = intParam($_POST['duration_minutes'] ?? 15);
 $calories = intParam($_POST['calories_burned'] ?? 0);
 $resistance = intParam($_POST['resistance_level'] ?? 0);
-$notes = trim($_POST['notes'] ?? '');
+$notes = stringParam($_POST['notes'] ?? '');
 
 if ($duration <= 0 || $duration > 120) {
     redirect('/cardio', 'Invalid duration', 'error');
@@ -33,7 +33,7 @@ if (!empty($existing)) {
 
 dbInsert('cardio_sessions', [
     'user_id' => $userId,
-    'session_type' => $sessionType,
+    'session_type' => substr($sessionType, 0, 50),
     'duration_minutes' => $duration,
     'calories_burned' => $calories > 0 ? $calories : null,
     'resistance_level' => $resistance > 0 ? $resistance : null,

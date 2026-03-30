@@ -13,8 +13,8 @@ $userId = currentUserId();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     requireCsrf();
     
-    $format = $_POST['format'] ?? 'csv';
-    $exportType = $_POST['export_type'] ?? 'workouts';
+    $format = in_array($_POST['format'] ?? '', ['csv', 'json']) ? $_POST['format'] : 'csv';
+    $exportType = in_array($_POST['export_type'] ?? '', ['workouts', 'sets']) ? $_POST['export_type'] : 'workouts';
     
     if ($exportType === 'workouts') {
         $data = exportWorkoutData($userId);
