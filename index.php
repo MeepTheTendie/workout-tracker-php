@@ -50,6 +50,7 @@ $routes = [
     'action/workouts/complete-set' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/workouts/complete-set.php'],
     'action/workouts/edit-set' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/workouts/edit-set.php'],
     'action/workouts/finish' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/workouts/finish.php'],
+    'action/workouts/remove-exercise' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/workouts/remove-exercise.php'],
     
     // Routines - Pages (GET)
     'routines' => ['method' => 'GET', 'auth' => true, 'file' => 'pages/routines/list.php'],
