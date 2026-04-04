@@ -8,14 +8,14 @@
 
 $userId = currentUserId();
 
-// Fetch all routines with exercise counts
+// Fetch all routines with exercise counts, ordered by sort_order for day sequence
 $routines = dbFetchAll(
     "SELECT r.*, COUNT(re.id) as exercise_count 
      FROM routines r 
      LEFT JOIN routine_exercises re ON r.id = re.routine_id 
      WHERE r.user_id = ? 
      GROUP BY r.id 
-     ORDER BY r.created_at DESC",
+     ORDER BY r.sort_order ASC, r.created_at DESC",
     [$userId]
 );
 
