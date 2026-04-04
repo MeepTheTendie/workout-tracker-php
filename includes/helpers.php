@@ -149,8 +149,8 @@ function getLastWeights(int $userId): array
  * Calculate suggested next weight for progression
  * 
  * Uses predefined progression rules for specific exercises to suggest
- * the next weight to attempt. Some exercises have special rules (e.g.,
- * Roc It gets +20 after 45 lbs, +15 before).
+ * the next weight to attempt. Includes rules for all exercises in
+ * the 3-day functional fitness program.
  * 
  * @param string $exerciseName Name of the exercise
  * @param float|null $lastWeight Last weight used for this exercise
@@ -159,14 +159,32 @@ function getLastWeights(int $userId): array
 function suggestNextWeight(string $exerciseName, ?float $lastWeight): ?float
 {
     $rules = [
-        'Back Extension' => ['increment' => 15, 'special' => null],
-        'Low Back - Roc It' => ['increment' => 15, 'special' => 'roc_it'], // +20 after 45
-        'Diverging Seated Row' => ['increment' => 10, 'special' => null],
-        'Leg Press' => ['increment' => 15, 'special' => null],
-        'Converging Chest Press' => ['increment' => 15, 'special' => null],
-        'Tricep Extensions' => ['increment' => 10, 'special' => null],
-        'Bicep Curl' => ['increment' => 15, 'special' => null],
-        'Shoulder Press - Machine' => ['increment' => 20, 'special' => null],
+        // DAY A - Lower + Bench
+        'Hack Squat' => ['increment' => 15, 'threshold' => 200, 'after_threshold' => 20],
+        'Bench Press' => ['increment' => 10, 'threshold' => 150, 'after_threshold' => 15],
+        'Romanian Deadlift' => ['increment' => 15, 'threshold' => 135, 'after_threshold' => 20],
+        'Diverging Seated Row' => ['increment' => 10, 'threshold' => null, 'after_threshold' => null],
+        'Leg Curl' => ['increment' => 10, 'threshold' => 100, 'after_threshold' => 15],
+        'Crunch' => ['increment' => 5, 'threshold' => null, 'after_threshold' => null],
+        // DAY B - Upper Pull + RDL
+        'Barbell Row' => ['increment' => 10, 'threshold' => 115, 'after_threshold' => 15],
+        'Lat Pulldown' => ['increment' => 10, 'threshold' => 130, 'after_threshold' => 15],
+        'Face Pull' => ['increment' => 5, 'threshold' => null, 'after_threshold' => null],
+        'Bicep Curl' => ['increment' => 5, 'threshold' => 50, 'after_threshold' => 10],
+        'Low Back - Roc It' => ['increment' => 15, 'threshold' => 100, 'after_threshold' => 20],
+        // DAY C - Tire + Conditioning
+        'Tire Squats' => ['increment' => 20, 'threshold' => 400, 'after_threshold' => 30],
+        'Chest Press' => ['increment' => 10, 'threshold' => 150, 'after_threshold' => 15],
+        'Leg Extension' => ['increment' => 10, 'threshold' => 130, 'after_threshold' => 15],
+        'Seated Dip' => ['increment' => 10, 'threshold' => 130, 'after_threshold' => 15],
+        'Shrug' => ['increment' => 10, 'threshold' => 130, 'after_threshold' => 15],
+        'Sled Push' => ['increment' => 10, 'threshold' => null, 'after_threshold' => null],
+        // LEGACY - Backwards compatibility
+        'Back Extension' => ['increment' => 15, 'threshold' => null, 'after_threshold' => null],
+        'Leg Press' => ['increment' => 15, 'threshold' => null, 'after_threshold' => null],
+        'Converging Chest Press' => ['increment' => 15, 'threshold' => null, 'after_threshold' => null],
+        'Tricep Extensions' => ['increment' => 10, 'threshold' => null, 'after_threshold' => null],
+        'Shoulder Press - Machine' => ['increment' => 20, 'threshold' => null, 'after_threshold' => null],
     ];
     
     if (!isset($rules[$exerciseName]) || $lastWeight === null) {
@@ -176,8 +194,9 @@ function suggestNextWeight(string $exerciseName, ?float $lastWeight): ?float
     $rule = $rules[$exerciseName];
     $increment = $rule['increment'];
     
-    if ($rule['special'] === 'roc_it' && $lastWeight >= 45) {
-        $increment = 20;
+    // Apply threshold increase if applicable
+    if ($rule['threshold'] !== null && $lastWeight >= $rule['threshold']) {
+        $increment = $rule['after_threshold'] ?? $increment;
     }
     
     return $lastWeight + $increment;
@@ -194,11 +213,31 @@ function suggestNextWeight(string $exerciseName, ?float $lastWeight): ?float
 function progressionNote(string $exerciseName): string
 {
     $notes = [
-        'Low Back - Roc It' => '+15 lbs (then +20 after 45)',
-        'Back Extension' => '+15 lbs',
+        // DAY A
+        'Hack Squat' => '+15 lbs (then +20 after 200)',
+        'Bench Press' => '+10 lbs (then +15 after 150)',
+        'Romanian Deadlift' => '+15 lbs (then +20 after 135)',
         'Diverging Seated Row' => '+10 lbs',
+        'Leg Curl' => '+10 lbs (then +15 after 100)',
+        'Crunch' => '+5 lbs or +5 reps',
+        // DAY B
+        'Barbell Row' => '+10 lbs (then +15 after 115)',
+        'Lat Pulldown' => '+10 lbs (then +15 after 130)',
+        'Face Pull' => '+5 lbs or +5 reps',
+        'Bicep Curl' => '+5 lbs (then +10 after 50)',
+        'Low Back - Roc It' => '+15 lbs (then +20 after 100)',
+        // DAY C
+        'Tire Squats' => '+20 lbs (then +30 after 400)',
+        'Chest Press' => '+10 lbs (then +15 after 150)',
+        'Leg Extension' => '+10 lbs (then +15 after 130)',
+        'Seated Dip' => '+10 lbs (then +15 after 130)',
+        'Shrug' => '+10 lbs (then +15 after 130)',
+        'Sled Push' => '+10 lbs or +2 reps',
+        // LEGACY
+        'Back Extension' => '+15 lbs',
         'Leg Press' => '+15 lbs',
-        'Bicep Curl' => '+15 lbs',
+        'Converging Chest Press' => '+15 lbs',
+        'Tricep Extensions' => '+10 lbs',
         'Shoulder Press - Machine' => '+20 lbs',
     ];
     

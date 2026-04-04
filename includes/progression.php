@@ -191,46 +191,6 @@ function getProgressionRule(string $exerciseName): ?array
 }
 
 /**
- * Calculate suggested next weight for progression
- * 
- * @param string $exerciseName
- * @param float|null $lastWeight
- * @return float|null
- */
-function suggestNextWeight(string $exerciseName, ?float $lastWeight): ?float
-{
-    if ($lastWeight === null) {
-        return null;
-    }
-    
-    $rule = getProgressionRule($exerciseName);
-    
-    if ($rule === null) {
-        return $lastWeight;
-    }
-    
-    $increment = $rule['increment'];
-    
-    if ($rule['threshold'] !== null && $lastWeight >= $rule['threshold']) {
-        $increment = $rule['after_threshold'] ?? $increment;
-    }
-    
-    return $lastWeight + $increment;
-}
-
-/**
- * Get progression note for display
- * 
- * @param string $exerciseName
- * @return string
- */
-function progressionNote(string $exerciseName): string
-{
-    $rule = getProgressionRule($exerciseName);
-    return $rule['note'] ?? '';
-}
-
-/**
  * Get progression rules as JSON for JavaScript
  * 
  * @return string JSON encoded rules
