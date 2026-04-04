@@ -7,6 +7,8 @@
  * and are ready for a weight increase.
  */
 
+require_once __DIR__ . '/../../includes/progression.php';
+
 $userId = currentUserId();
 $routineId = intParam($_GET['id'] ?? 0);
 
