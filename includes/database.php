@@ -32,7 +32,17 @@ function getDB(): PDO
         $user = $_ENV['DB_USER'] ?? 'meep';
         $pass = $_ENV['DB_PASS'] ?? '';
         
-        $dsn = "mysql:host={$host};dbname={$name};charset=utf8mb4";
+        // Use SQLite when DB_HOST is empty (for testing)
+        if (empty($host)) {
+            $dsn = "sqlite:{$name}";
+            if ($name === ':memory:') {
+                $dsn = 'sqlite::memory:';
+            }
+            $user = null;
+            $pass = null;
+        } else {
+            $dsn = "mysql:host={$host};dbname={$name};charset=utf8mb4";
+        }
         
         try {
             $db = new PDO($dsn, $user, $pass, [

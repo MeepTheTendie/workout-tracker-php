@@ -98,9 +98,9 @@ class HelperTest extends TestCase
         // Test Leg Press (default +15)
         $this->assertEquals(215, suggestNextWeight('Leg Press', 200));
         
-        // Test Roc It with special rule (+15 under 45, +20 at/after 45)
+        // Test Low Back - Roc It with threshold (+15 under 100, +20 at/after 100)
         $this->assertEquals(55, suggestNextWeight('Low Back - Roc It', 40)); // 40 + 15 = 55
-        $this->assertEquals(65, suggestNextWeight('Low Back - Roc It', 45)); // 45 + 20 = 65
+        $this->assertEquals(120, suggestNextWeight('Low Back - Roc It', 100)); // 100 + 20 = 120
         
         // Test unknown exercise returns same weight
         $this->assertEquals(100, suggestNextWeight('Unknown Exercise', 100));
@@ -119,7 +119,7 @@ class HelperTest extends TestCase
     public function testProgressionNote(): void
     {
         $this->assertEquals('+15 lbs', progressionNote('Back Extension'));
-        $this->assertEquals('+15 lbs (then +20 after 45)', progressionNote('Low Back - Roc It'));
+        $this->assertEquals('+15 lbs (then +20 after 100)', progressionNote('Low Back - Roc It'));
         $this->assertEquals('', progressionNote('Unknown Exercise'));
     }
     

@@ -116,6 +116,9 @@ function applyRule(string $field, $value, string $rule, ?string $arg)
             if (!is_string($value) && $value !== null) {
                 throw new ValidationError(ucfirst($field) . ' must be text');
             }
+            if ($value === null) {
+                return null;  // null passes through string validation
+            }
             return trim($value ?? '');
             
         case 'email':
