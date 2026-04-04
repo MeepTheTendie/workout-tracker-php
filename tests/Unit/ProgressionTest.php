@@ -1,11 +1,17 @@
 <?php
 /**
  * Progression Rules Unit Tests
+ * 
+ * Tests the progression rules system including:
+ * - getProgressionRules()
+ * - suggestNextWeight() (from helpers.php)
+ * - progressionNote() (from helpers.php)
  */
 
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../../includes/progression.php';
+require_once __DIR__ . '/../../includes/helpers.php';
 
 class ProgressionTest extends TestCase
 {
@@ -52,18 +58,18 @@ class ProgressionTest extends TestCase
     
     public function testSuggestNextWeightAfterThreshold(): void
     {
-        // Low Back - Roc It: +15 normally, +20 after 45 lbs
-        $result = suggestNextWeight('Low Back - Roc It', 50);
+        // Low Back - Roc It: +15 normally, +20 after 100 lbs
+        $result = suggestNextWeight('Low Back - Roc It', 105);
         
-        $this->assertSame(70.0, $result); // 50 + 20
+        $this->assertSame(125.0, $result); // 105 + 20
     }
     
     public function testSuggestNextWeightAtThreshold(): void
     {
-        // Low Back - Roc It: +15 normally, +20 after 45 lbs
-        $result = suggestNextWeight('Low Back - Roc It', 45);
+        // Low Back - Roc It: +15 normally, +20 after 100 lbs
+        $result = suggestNextWeight('Low Back - Roc It', 100);
         
-        $this->assertSame(65.0, $result); // 45 + 20 (>= threshold)
+        $this->assertSame(120.0, $result); // 100 + 20 (>= threshold)
     }
     
     public function testSuggestNextWeightNoRule(): void
@@ -99,7 +105,7 @@ class ProgressionTest extends TestCase
     {
         $note = progressionNote('Low Back - Roc It');
         
-        $this->assertSame('+15 lbs (then +20 after 45)', $note);
+        $this->assertSame('+15 lbs (then +20 after 100)', $note);
     }
     
     public function testGetProgressionRulesJson(): void
