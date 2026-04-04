@@ -64,6 +64,8 @@ $routes = [
     'action/routines/start' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/routines/start.php'],
     'action/routines/add-exercise' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/routines/add-exercise.php'],
     'action/routines/remove-exercise' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/routines/remove-exercise.php'],
+    'action/routines/update-exercise-targets' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/routines/update-exercise-targets.php'],
+    'action/routines/apply-progression' => ['method' => 'POST', 'auth' => true, 'file' => 'actions/routines/apply-progression.php'],
     
     // Stats
     'stats' => ['method' => 'GET', 'auth' => true, 'file' => 'pages/stats.php'],

@@ -1,21 +1,34 @@
 <?php
 /**
  * Complete Set Action
- * For routine-based workouts (pre-populated sets)
+ * 
+ * Marks a pre-populated workout set as completed with actual reps/weight.
+ * Used during routine-based workouts where sets are pre-populated with targets.
+ * 
+ * @package WorkoutTracker\Actions
  */
 
 requireCsrf();
 
+/** @var int Current authenticated user's ID */
 $userId = currentUserId();
+
+/** @var int The workout set ID to complete */
 $setId = intParam($_POST['set_id'] ?? 0);
+
+/** @var int Actual reps performed (required) */
 $reps = intParam($_POST['reps'] ?? 0);
+
+/** @var float Actual weight used */
 $weight = floatParam($_POST['weight'] ?? 0);
 
+// Validate required fields
 if ($setId <= 0 || $reps <= 0) {
     redirect('/workouts/log', 'Invalid set data', 'error');
 }
 
-// Verify set belongs to user's active workout and is not completed
+// Verify set belongs to user's active workout and is not already completed
+// This prevents double-logging and ensures the workout is still in progress
 $set = dbFetchOne(
     "SELECT ws.id 
      FROM workout_sets ws 
@@ -28,11 +41,11 @@ if (!$set) {
     redirect('/workouts/log', 'Set not found or already completed', 'error');
 }
 
-// Update set
+// Update the set with actual performance data and timestamp
 dbUpdate('workout_sets', [
     'reps' => $reps,
     'weight' => $weight,
-    'completed_at' => now(),
+    'completed_at' => now(),  // Marks set as completed
     'updated_at' => now()
 ], 'id = ?', [$setId]);
 
